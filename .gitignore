@@ -1,0 +1,17 @@
+.gradle/
+build/
+**/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.kotlin/
+.externalNativeBuild/
+.cxx/
+
+# Signing credentials stay out of version control
+keystore.properties
+keystore/
+*.jks
+*.keystore
