@@ -1,0 +1,5 @@
+# Teores alcoólicos publicados na nota †† da Tabela 1 da TACO 4ª ed. Usados só na verificação E9
+# (o carboidrato da TACO é calculado por diferença descontando o álcool).
+number,alcohol_g,reference
+472,"31,1","TACO 4ª ed., Tabela 1, nota ††: Cana, aguardente: 31,1 g/100 g"
+474,"3,6","TACO 4ª ed., Tabela 1, nota ††: Cerveja, pilsen: 3,6 g/100 g"

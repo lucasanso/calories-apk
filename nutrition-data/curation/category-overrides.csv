@@ -1,0 +1,53 @@
+# Exceções à categoria padrão do grupo (taco-groups.csv). Categoria é organização da lista, não afirmação nutricional.
+key,category,reason
+TACO4:86,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:87,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:88,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:89,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:90,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:91,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:92,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:93,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:94,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:99,CARBS,"Derivado de mandioca (farinha, fécula, polvilho, pão de queijo, biscoito de polvilho)."
+TACO4:102,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:103,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:121,CARBS,"Derivado de mandioca (farinha, fécula, polvilho, pão de queijo, biscoito de polvilho)."
+TACO4:122,CARBS,"Derivado de mandioca (farinha, fécula, polvilho, pão de queijo, biscoito de polvilho)."
+TACO4:123,CARBS,"Derivado de mandioca (farinha, fécula, polvilho, pão de queijo, biscoito de polvilho)."
+TACO4:124,CARBS,"Derivado de mandioca (farinha, fécula, polvilho, pão de queijo, biscoito de polvilho)."
+TACO4:126,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:129,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:130,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:131,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:132,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:136,CARBS,"Tubérculo amiláceo e preparações; no requisito batata, batata-doce e mandioca estão em Carboidratos."
+TACO4:140,CARBS,"Derivado de mandioca (farinha, fécula, polvilho, pão de queijo, biscoito de polvilho)."
+TACO4:141,CARBS,"Derivado de mandioca (farinha, fécula, polvilho, pão de queijo, biscoito de polvilho)."
+TACO4:146,CARBS,"Derivado de mandioca (farinha, fécula, polvilho, pão de queijo, biscoito de polvilho)."
+TACO4:163,FATS,"No requisito, abacate está em Gorduras."
+TACO4:324,OTHERS,Caldo em tablete (condimento).
+TACO4:325,OTHERS,Caldo em tablete (condimento).
+TACO4:444,FATS,Toucinho: predominantemente gordura.
+TACO4:445,FATS,Toucinho: predominantemente gordura.
+TACO4:447,FATS,Creme de leite: predominantemente gordura.
+TACO4:453,OTHERS,Leite condensado: doce lácteo.
+TACO4:520,FATS,"Produto predominantemente gorduroso (azeitona, chantilly, leite de coco, maionese)."
+TACO4:521,FATS,"Produto predominantemente gorduroso (azeitona, chantilly, leite de coco, maionese)."
+TACO4:522,FATS,"Produto predominantemente gorduroso (azeitona, chantilly, leite de coco, maionese)."
+TACO4:523,FATS,"Produto predominantemente gorduroso (azeitona, chantilly, leite de coco, maionese)."
+TACO4:524,FATS,"Produto predominantemente gorduroso (azeitona, chantilly, leite de coco, maionese)."
+TACO4:533,CARBS,"No requisito, cuscuz e tapioca estão em Carboidratos."
+TACO4:534,CARBS,"No requisito, cuscuz e tapioca estão em Carboidratos."
+TACO4:551,CARBS,"No requisito, cuscuz e tapioca estão em Carboidratos."
+TACO4:557,FATS,"No requisito, amendoim está em Gorduras."
+TACO4:558,FATS,"No requisito, amendoim está em Gorduras."
+TACO4:579,OTHERS,Doce de amendoim.
+TACO4:580,OTHERS,Doce de amendoim.
+TACO4:581,PROTEINS,Derivado de soja rico em proteína.
+TACO4:582,PROTEINS,Derivado de soja rico em proteína.
+TACO4:583,PROTEINS,Derivado de soja rico em proteína.
+TACO4:584,PROTEINS,Derivado de soja rico em proteína.
+TACO4:592,CARBS,"Farinha/semente amilácea (babaçu, pinhão, pupunha)."
+TACO4:595,CARBS,"Farinha/semente amilácea (babaçu, pinhão, pupunha)."
+TACO4:596,CARBS,"Farinha/semente amilácea (babaçu, pinhão, pupunha)."

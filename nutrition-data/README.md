@@ -1,47 +1,62 @@
 # nutrition-data
 
-Dados de origem da biblioteca nutricional do Calories. O processo completo está em [docs/03-biblioteca-nutricional.md](../docs/03-biblioteca-nutricional.md).
-
-> Status: **estrutura definida na Fase 1, ainda sem dados.** Os arquivos são adicionados na Fase 2.
+Dados de origem e decisões de curadoria da biblioteca nutricional do Calories. Metodologia completa em [docs/03-biblioteca-nutricional.md](../docs/03-biblioteca-nutricional.md).
 
 ## Estrutura
 
 ```
 nutrition-data/
-├── sources.lock.json        # manifesto: cada arquivo bruto com URL, data de acesso, versão, licença e SHA-256
+├── sources.lock.json        # cada fonte: citação, licença, data de acesso e arquivos com URL + SHA-256
 ├── raw/                     # arquivos oficiais exatamente como baixados (nunca editar)
-│   ├── taco-4ed/            # PDF (e planilha, se o NEPA publicar) da TACO 4ª ed.
-│   │   └── extracted/       # CSV extraído do PDF, se necessário, com o comando usado
-│   ├── tbca-7.x/
-│   │   └── manual/          # transcrições por alimento (lista de lacunas), com URL e data
-│   └── usda-fdc/            # CSVs oficiais SR Legacy / Foundation Foods
-├── curation/                # decisões humanas, revisáveis em PR
-│   ├── include-list.csv
-│   ├── category-map.csv
+│   ├── taco-4ed/
+│   │   ├── Taco-4a-Edicao.xlsx                       # planilha oficial (NEPA/UNICAMP)
+│   │   └── taco_4_edicao_ampliada_e_revisada.pdf     # publicação oficial (checagem cruzada)
+│   └── usda-fdc/
+│       └── FoodData_Central_sr_legacy_food_csv_2018-04.zip
+├── curation/                # decisões humanas, revisáveis, sempre com justificativa
+│   ├── categories.csv
+│   ├── taco-groups.csv
+│   ├── category-overrides.csv
 │   ├── preparation-overrides.csv
 │   ├── display-names.csv
 │   ├── aliases.csv
-│   ├── accepted-warnings.csv
+│   ├── usda-foods.csv
+│   ├── source-corrections.csv
+│   ├── taco-pdf-deviations.csv
+│   ├── value-exclusions.csv
+│   ├── taco-alcohol.csv
 │   ├── golden-values.csv
+│   ├── requested-foods.csv
 │   └── library-version.txt
 └── reports/
-    └── import-report.md     # gerado pelo importador
+    └── import-report.md     # gerado pelo importador (não editar)
 ```
 
-## Como fornecer os arquivos oficiais
+## Fontes
 
-Se este ambiente não tiver acesso aos sites das fontes, baixe os arquivos e coloque-os nas pastas acima, **sem renomear nem modificar o conteúdo**:
-
-| Fonte | Onde obter | Pasta |
+| Fonte | Licença | Uso |
 |---|---|---|
-| TACO 4ª edição (NEPA/UNICAMP) | Site do NEPA/UNICAMP, seção TACO | `raw/taco-4ed/` |
-| TBCA (FoRC/USP) | tbca.net.br. Leia o termo de uso antes. | `raw/tbca-7.x/` |
-| USDA FoodData Central | fdc.nal.usda.gov, página de download (CSV de SR Legacy e Foundation Foods) | `raw/usda-fdc/` |
+| TACO 4ª ed. (NEPA/UNICAMP, 2011) | "É permitida a reprodução total ou parcial do material, desde que seja citada a fonte." | Tabela completa (597 itens) |
+| USDA FoodData Central — SR Legacy (2018-04) | Domínio público, CC0 1.0 | 14 itens que faltam na TACO |
+| TBCA (FoRC/USP) | "Não é permitida a reprodução total ou parcial do material." | Não incorporada |
 
-O importador calcula o SHA-256 de cada arquivo e o registra no `sources.lock.json` na primeira execução. Nas execuções seguintes, compara o hash e para se algum arquivo mudar.
+## Comandos
+
+```bash
+./gradlew :tools:food-importer:generateFoodLibrary
+```
+
+```bash
+./gradlew :tools:food-importer:verifyFoodLibrary
+```
+
+- `generateFoodLibrary` gera `app/src/main/assets/library/food_library.json` e `reports/import-report.md`.
+- `verifyFoodLibrary` falha se o asset commitado for diferente do que seria gerado.
 
 ## Regras
 
-- Nunca editar arquivos de `raw/`. Correções e decisões ficam em `curation/`, com justificativa.
-- Nunca digitar valores nutricionais fora de `golden-values.csv`. Esse arquivo serve só para conferência e registra a página da fonte de cada valor.
+- Nunca editar arquivos de `raw/`. Para trocar um arquivo, atualize URL, data e SHA-256 em `sources.lock.json`. O importador recusa hash divergente.
+- Nunca digitar valores nutricionais. A curadoria decide nome, categoria, preparo, sinônimos e exclusões documentadas. Valores vêm só dos arquivos oficiais.
+- `golden-values.csv` serve só para conferência. Seus valores foram extraídos por um caminho independente do importador: `pdftotext` para a TACO e o dataset JSON para o USDA.
+- Toda mudança no conteúdo exige incrementar `curation/library-version.txt`, regra E12. É isso que faz o app reimportar.
 - O asset `app/src/main/assets/library/food_library.json` é **gerado**. Não editar à mão.

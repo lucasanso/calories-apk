@@ -1,0 +1,5 @@
+# Correções de texto da fonte. Valores nutricionais NUNCA são corrigidos aqui.
+source,code,field,value,reason
+TACO4,540,description,Feijoada,"A planilha oficial traz a descrição 'L' para o item 540; o PDF oficial (p. 63 do arquivo) traz 'Feijoada'. Valores conferidos: planilha = PDF."
+TACO4,472,description,"Cana, aguardente","Removido o marcador de nota de rodapé '1' (nota †† da Tabela 1: teor alcoólico)."
+TACO4,474,description,"Cerveja, pilsen","Removido o marcador de nota de rodapé '2' (nota †† da Tabela 1: teor alcoólico)."

@@ -1,0 +1,7 @@
+# Categorias do app (as cinco do requisito). A categoria organiza a lista; não é afirmação nutricional.
+code,name,sort_order
+PROTEINS,Proteínas,1
+CARBS,Carboidratos,2
+FATS,Gorduras,3
+VEGETABLES,Vegetais e legumes,4
+OTHERS,Outros,5

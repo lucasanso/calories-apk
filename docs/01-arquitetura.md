@@ -42,7 +42,7 @@ flowchart TB
         WM["WorkManager (lembretes, backup automático)"]
     end
     subgraph tools[":tools:food-importer — CLI JVM"]
-        PIPE["Pipeline TACO / TBCA / USDA<br/>→ food_library.json"]
+        PIPE["Pipeline TACO / USDA<br/>→ food_library.json"]
     end
 
     UI --> VM --> UC
@@ -62,6 +62,7 @@ flowchart TB
 - `:data` depende de `:domain`. Entidades Room e DAOs são `internal`, então nenhuma tela consegue usar uma entidade diretamente.
 - `:app` depende de `:domain`. Depende de `:data` só para a composição no Hilt.
 - `:tools:food-importer` depende de `:domain`. Ele reutiliza os modelos e validadores nutricionais, então o importador e o app aplicam as mesmas regras.
+- `:library-format` define o formato do asset da biblioteca (`LibraryAsset`). O importador o escreve e o `:data` o lê, então os dois lados nunca divergem.
 
 Essas fronteiras são garantidas pelo compilador, não por convenção. O código de `:domain` simplesmente não compila se importar `android.*`.
 
@@ -72,7 +73,8 @@ Essas fronteiras são garantidas pelo compilador, não por convenção. O códig
 | `:app` | `com.android.application` | Activity única, tema, navegação, telas e ViewModels por funcionalidade, componentes reutilizáveis, gráficos em Canvas, formatação pt-BR. |
 | `:domain` | Kotlin/JVM | Modelos (`Food`, `Nutrients`, `Quantity`, `DiaryEntry`…), motor nutricional, use cases, interfaces de repositório, `Clock` injetável. |
 | `:data` | `com.android.library` | Room (schema, DAOs, views, FTS, migrations), repositórios, `LibrarySeeder`, DataStore, backup e exportação, workers. |
-| `:tools:food-importer` | Kotlin/JVM (aplicação CLI) | Lê os arquivos oficiais das fontes, normaliza, valida e gera `food_library.json` e o relatório de importação. |
+| `:library-format` | Kotlin/JVM + kotlinx.serialization | Formato do asset `food_library.json` (`LibraryAsset`, `LibraryAssetCodec`), compartilhado entre importador e app. |
+| `:tools:food-importer` | Kotlin/JVM (aplicação CLI) | Lê os arquivos oficiais das fontes, faz a checagem cruzada, normaliza, valida e gera `food_library.json` e o relatório de importação. Não entra no APK. |
 
 Não haverá módulos por funcionalidade (`:feature:*`). Para um app pessoal com cinco abas, o custo de build e configuração não compensa. A separação por funcionalidade fica nos pacotes de `:app`.
 
@@ -138,7 +140,7 @@ Os use cases não precisam de módulo: têm `@Inject constructor` e o Hilt os co
 
 | # | Decisão | Alternativas consideradas | Motivo |
 |---|---|---|---|
-| D1 | Quatro módulos (`app`, `domain`, `data`, `tools`) | Um único `:app` com pacotes; módulos por funcionalidade | O compilador garante as fronteiras de camada. Os testes de domínio rodam na JVM, em segundos. O importador reaproveita as regras do domínio. |
+| D1 | Módulos `app`, `domain`, `data`, `library-format` e `tools` | Um único `:app` com pacotes; módulos por funcionalidade | O compilador garante as fronteiras de camada. Os testes de domínio rodam na JVM, em segundos. O importador reaproveita as regras do domínio. |
 | D2 | Uma tabela `food` com coluna `origin` (`LIBRARY`/`CUSTOM`) | Duas tabelas, uma para a biblioteca e outra para os personalizados | Uma única chave estrangeira para refeições e planos, e uma única busca. A proteção da biblioteca vem de três camadas: DAOs separados, regra de domínio e teste (ver 02, §2.4). |
 | D3 | Snapshot nutricional em cada `diary_entry` | Recalcular o histórico a partir do alimento vivo | O requisito exige preservar os valores do momento do consumo. |
 | D4 | `daily_nutrition` como `@DatabaseView` | Tabela de totais atualizada pelo app | Sem cache não há como os totais divergirem dos lançamentos. O volume (alguns milhares de linhas por ano) é trivial para o SQLite com índice por data. |
@@ -192,25 +194,23 @@ calories-apk/
 │   ├── README.md
 │   ├── sources.lock.json                # URL, data de acesso e SHA-256 de cada arquivo bruto
 │   ├── raw/                             # arquivos oficiais, sem modificação
-│   │   ├── taco-4ed/
-│   │   ├── tbca-7.x/
-│   │   └── usda-fdc/
-│   ├── curation/                        # decisões humanas, revisáveis em PR
-│   │   ├── include-list.csv             # quais itens entram na biblioteca
-│   │   ├── category-map.csv             # grupo da fonte → categoria do app
-│   │   ├── preparation-overrides.csv    # preparo quando o nome é ambíguo
-│   │   ├── display-names.csv            # nome amigável (opcional)
-│   │   ├── aliases.csv                  # sinônimos de busca
-│   │   └── golden-values.csv            # valores conferidos manualmente na fonte
-│   └── reports/                         # relatório gerado a cada importação
+│   │   ├── taco-4ed/                    # planilha .xlsx + PDF do NEPA/UNICAMP
+│   │   └── usda-fdc/                    # CSV SR Legacy 2018-04
+│   ├── curation/                        # decisões humanas, revisáveis em PR (ver 03, §3.5)
+│   └── reports/import-report.md         # relatório gerado a cada importação
+├── library-format/                      # formato do asset (LibraryAsset, LibraryAssetCodec)
 ├── tools/
 │   └── food-importer/
 │       └── src/main/kotlin/com/calories/importer/
-│           ├── Main.kt
-│           ├── source/  (TacoReader, TbcaReader, FdcReader)
-│           ├── normalize/ (NumberParser, SymbolMapper, PreparationClassifier, CategoryMapper)
-│           ├── validate/ (Rules, GoldenValueCheck)
-│           └── emit/ (LibraryJsonWriter, ReportWriter)
+│           ├── Main.kt, ImportPipeline.kt, SourcesLock.kt
+│           ├── io/        (CsvReader, XlsxReader, Hashing)
+│           ├── taco/      (TacoWorkbook, TacoValue, TacoNormalizer, TacoPdfCrossCheck)
+│           ├── usda/      (FdcSrLegacyReader)
+│           ├── curation/  (Curation)
+│           ├── classify/  (PreparationClassifier)
+│           ├── assemble/  (FoodAssembler)
+│           ├── validate/  (LibraryValidator)
+│           └── report/    (ImportReport)
 ├── domain/
 │   └── src/main/kotlin/com/calories/domain/
 │       ├── model/        (Food, Nutrients, NutrientValue, Quantity, MeasureUnit, Preparation,
@@ -231,7 +231,7 @@ calories-apk/
 │       │   ├── converter/ (LocalDate, enums)
 │       │   └── migration/ (Migrations.kt, AutoMigrationSpecs)
 │       ├── repository/   (implementações + mappers)
-│       ├── seed/         (LibrarySeeder, LibraryAssetDto, DefaultsSeeder)
+│       ├── seed/         (LibrarySeeder, DefaultsSeeder; lê o asset via :library-format)
 │       ├── backup/       (BackupDto, BackupValidator, BackupManager, CsvWriter)
 │       ├── preferences/  (SettingsDataStore)
 │       └── work/         (MealReminderWorker, AutoBackupWorker)
@@ -271,9 +271,10 @@ Versões estáveis mais recentes publicadas no Google Maven e no Maven Central, 
 | Biblioteca | Versão | Uso |
 |---|---|---|
 | Android Gradle Plugin | 9.5.1 (alternativa: 8.13.2) | Build |
-| Kotlin | 2.4.21 | Linguagem e plugin Compose |
+| Gradle (wrapper) | 9.9.0 ✔ | Build |
+| Kotlin | 2.4.21 ✔ | Linguagem e plugin Compose |
 | KSP | 2.3.13 | Processamento de anotações do Room e do Hilt |
-| JDK (toolchain) | 21 | Compilação |
+| JDK (toolchain) | 21 ✔ | Compilação |
 | Compose BOM | 2026.09.00 | UI, Material 3, ícones, animações |
 | Navigation Compose | 2.10.2 | Navegação com rotas tipadas |
 | Lifecycle (runtime-compose, viewmodel-compose) | 2.11.0 | `collectAsStateWithLifecycle`, ViewModel |
@@ -283,9 +284,12 @@ Versões estáveis mais recentes publicadas no Google Maven e no Maven Central, 
 | DataStore Preferences | 1.3.0 | Preferências |
 | WorkManager | 2.12.0 | Lembretes e backup automático (opcionais) |
 | kotlinx-coroutines | 1.11.0 | Concorrência e Flow |
-| kotlinx-serialization-json | Linha compatível com Kotlin 2.4 (fixada na Fase 3) | Asset da biblioteca, backup, rotas |
+| kotlinx-serialization-json | 1.12.0 ✔ | Asset da biblioteca, backup, rotas |
 | JUnit 4, kotlinx-coroutines-test, Turbine 1.2.1, Robolectric 4.17 | — | Testes de domínio, de Flow, de Room na JVM e de UI |
 | Compose UI Test | via BOM | Testes de fluxo de tela |
+| Apache PDFBox | 3.0.8 ✔ | Só no importador (checagem cruzada com o PDF da TACO); não vai para o APK |
+
+✔ = já fixado em `gradle/libs.versions.toml` e compilando (Fase 2). As demais são fixadas no esqueleto Android da Fase 3.
 
 SDK:
 - `minSdk 26`: `java.time` nativo, sem *desugaring*.

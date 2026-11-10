@@ -4,8 +4,8 @@
 
 | Fase | Entregas | Critério de pronto |
 |---|---|---|
-| **1. Análise e arquitetura** (esta) | Documentos `01`–`06` e estrutura de `nutrition-data/` | Arquitetura, modelagem, diretórios, bibliotecas, estratégia de importação, de cálculo e de navegação revisadas pelo usuário |
-| **2. Banco nutricional** | `sources.lock.json`; arquivos brutos; `:tools:food-importer` com testes; `curation/*.csv`; `golden-values.csv`; `food_library.json`; relatório de importação; atualização de `03` com as confirmações | Importador determinístico; zero erros; valores de ouro conferidos; todos os itens ✅ de 03, §3.8 presentes; lacunas resolvidas ou documentadas |
+| **1. Análise e arquitetura** ✅ | Documentos `01`–`06` e estrutura de `nutrition-data/` | Arquitetura, modelagem, diretórios, bibliotecas, estratégia de importação, de cálculo e de navegação revisadas pelo usuário |
+| **2. Banco nutricional** ✅ | Arquivos oficiais com SHA-256 (`sources.lock.json`); módulos `:domain`, `:library-format` e `:tools:food-importer` com 41 testes; curadoria em `nutrition-data/curation/`; `food_library.json` (611 alimentos); relatório de importação; `docs/03` atualizado | 0 erros; planilha × PDF da TACO: 5.796 valores, 0 divergências; 213 valores de ouro conferidos; asset determinístico (`verifyFoodLibrary`); todos os 60 itens da lista inicial mapeados |
 | **3. MVP** | Esqueleto Gradle (4 módulos) compilando e gerando APK; Room v1 + seed; Hoje; Alimentos (biblioteca, busca, personalizados, favoritos); refeições (slots, adicionar, editar, remover, duplicar, modelos); metas manuais e calculadora | Fluxos de 05, §5.3 funcionando no aparelho; testes de domínio e de DAO passando; APK de debug instalável |
 | **4. Recursos avançados** | Histórico com gráficos; peso; planejamento (planos, calendário, aplicar e copiar); lista de compras; exportação CSV/JSON; backup e restauração; lembretes opcionais | Fluxos completos; backup de ida e volta idêntico; restauração atômica |
 | **5. Testes e entrega** | Bateria completa (6.2); testes de migration; APK release assinado; README com instalação; documentação final | Todos os testes passando; APK instalado e verificado no Galaxy S26 |
@@ -37,9 +37,9 @@ Cada fase termina com commit e push, e nenhuma fase começa sem a anterior estar
 
 | Risco | Impacto | Mitigação |
 |---|---|---|
-| Termos de uso da TBCA impedem a incorporação | Lacunas (tilápia, cottage, macarrão cozido…) sem fonte brasileira | Fallback para USDA (CC0) identificado como internacional, ou cadastro pelo rótulo. A TBCA é isolada na lista de inclusão e pode ser removida com uma linha. |
-| Extração do PDF da TACO com erro de coluna | Valores errados silenciosos | Usar planilha oficial se existir; verificações kcal↔kJ e soma centesimal = 100; dupla transcrição; golden values |
-| Rede do ambiente bloqueia as fontes oficiais | Fase 2 não começa | Liberar domínios ou o usuário fornece os arquivos em `nutrition-data/raw/` |
+| ~~Termos de uso da TBCA impedem a incorporação~~ (confirmado) | Lacunas (tilápia, cottage, macarrão cozido…) sem fonte brasileira | Resolvido na Fase 2: lacunas cobertas pelo USDA (CC0), identificadas como referência internacional; produtos de marca pelo rótulo. |
+| ~~Extração do PDF da TACO com erro de coluna~~ | Valores errados silenciosos | Resolvido: a planilha oficial é a fonte primária e o PDF é usado só na checagem cruzada por coordenada (0 divergências), mais os valores de ouro extraídos por outra ferramenta |
+| ~~Rede do ambiente bloqueia as fontes oficiais~~ | Fase 2 não começa | Resolvido: domínios liberados; os arquivos ficam versionados no repositório |
 | AGP 9 incompatível com KSP ou Hilt na versão escolhida | Atraso no esqueleto | Esqueleto primeiro; fallback para a linha AGP 8.13 |
 | Usuário espera registrar leite em ml | Atrito | Densidade só com fonte; explicação na interface; o personalizado pode usar referência em ml |
 | Confusão entre peso cru e peso pronto | Totais errados | Preparo sempre visível, agrupamento por nome base com escolha explícita, nota na lista de compras |
@@ -47,6 +47,5 @@ Cada fase termina com commit e push, e nenhuma fase começa sem a anterior estar
 
 ## 6.5 Decisões que dependem do usuário
 
-1. **Acesso às fontes oficiais:** liberar `nepa.unicamp.br`, `tbca.net.br` e `fdc.nal.usda.gov` no ambiente, ou enviar os arquivos.
-2. **TBCA:** prosseguir com o uso condicional descrito em 03, §3.2, ou usar apenas TACO + USDA + rótulos.
-3. **Repositório público ou privado.** Isso não muda as licenças (TACO e USDA permitem redistribuição; a TBCA é não comercial), mas define quem vê o asset gerado.
+1. **TBCA:** o termo oficial proíbe reprodução, mesmo parcial, e este repositório é público. Por isso a TBCA não entra na biblioteca. Para usá-la há duas saídas: cadastrar os itens desejados como alimentos personalizados no app (uso pessoal da informação, com citação), ou tornar o repositório privado e pedir autorização à equipe da TBCA.
+2. **Cadastro pelo rótulo** de produtos de marca (whey, iogurte proteico, granola, goma de tapioca): o app terá o fluxo "Criar a partir do rótulo" na Fase 3.

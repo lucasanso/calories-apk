@@ -1,0 +1,50 @@
+{
+  "sources": [
+    {
+      "code": "TACO4",
+      "name": "Tabela Brasileira de Composição de Alimentos – TACO",
+      "edition": "4ª edição revisada e ampliada",
+      "publisher": "NEPA/UNICAMP",
+      "year": 2011,
+      "url": "https://nepa.unicamp.br/publicacoes/tabela-taco-excel/",
+      "license": "É permitida a reprodução total ou parcial do material, desde que seja citada a fonte (TACO 4ª ed., p. ii).",
+      "citation": "NÚCLEO DE ESTUDOS E PESQUISAS EM ALIMENTAÇÃO – NEPA. Tabela Brasileira de Composição de Alimentos – TACO. 4. ed. rev. e ampl. Campinas: NEPA/UNICAMP, 2011. 161 p.",
+      "carbohydrateBasis": "TOTAL_BY_DIFFERENCE",
+      "accessedAt": "2026-11-10",
+      "files": [
+        {
+          "role": "workbook",
+          "path": "raw/taco-4ed/Taco-4a-Edicao.xlsx",
+          "url": "https://nepa.unicamp.br/wp-content/uploads/sites/27/2023/10/Taco-4a-Edicao.xlsx",
+          "sha256": "a66b8ec528daeabc63bc2b015fc9bd8c6d76b941c2fc0ed93a4311d449302d14"
+        },
+        {
+          "role": "pdf",
+          "path": "raw/taco-4ed/taco_4_edicao_ampliada_e_revisada.pdf",
+          "url": "https://nepa.unicamp.br/wp-content/uploads/sites/27/2023/10/taco_4_edicao_ampliada_e_revisada.pdf",
+          "sha256": "2002aec5615b5b1395aaa8fa675635bbb7f712c33f278af5e332f1cac8f108c8"
+        }
+      ]
+    },
+    {
+      "code": "USDA_SR",
+      "name": "USDA FoodData Central – SR Legacy",
+      "edition": "SR Legacy, abril de 2018",
+      "publisher": "U.S. Department of Agriculture, Agricultural Research Service",
+      "year": 2018,
+      "url": "https://fdc.nal.usda.gov/download-datasets/",
+      "license": "Domínio público, CC0 1.0 Universal (USDA solicita citar o FoodData Central como fonte).",
+      "citation": "U.S. Department of Agriculture, Agricultural Research Service, Beltsville Human Nutrition Research Center. FoodData Central: SR Legacy (2018-04). [Internet]. [citado em 10 nov. 2026]. Disponível em: https://fdc.nal.usda.gov/.",
+      "carbohydrateBasis": "TOTAL_BY_DIFFERENCE",
+      "accessedAt": "2026-11-10",
+      "files": [
+        {
+          "role": "csv-zip",
+          "path": "raw/usda-fdc/FoodData_Central_sr_legacy_food_csv_2018-04.zip",
+          "url": "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip",
+          "sha256": "b80817294b8850530aaedf2e515c02593b1824f763a0ff356e5c2081643e6fd0"
+        }
+      ]
+    }
+  ]
+}

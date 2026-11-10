@@ -1,0 +1,101 @@
+# Preparo de itens cuja descrição na fonte não traz palavra de preparo (cru, cozido, grelhado...).
+# Decisão humana, com justificativa. Itens sem decisão interrompem a importação (E6).
+key,preparation,reason
+TACO4:8,READY_TO_EAT,"Biscoito industrializado, consumido como comprado."
+TACO4:9,READY_TO_EAT,"Biscoito industrializado, consumido como comprado."
+TACO4:10,READY_TO_EAT,"Biscoito industrializado, consumido como comprado."
+TACO4:11,READY_TO_EAT,"Biscoito industrializado, consumido como comprado."
+TACO4:12,READY_TO_EAT,"Biscoito industrializado, consumido como comprado."
+TACO4:13,READY_TO_EAT,"Biscoito industrializado, consumido como comprado."
+TACO4:14,DRIED,"Mistura em pó para bolo (produto seco, antes do preparo)."
+TACO4:15,READY_TO_EAT,Bolo pronto.
+TACO4:16,READY_TO_EAT,Bolo pronto.
+TACO4:17,READY_TO_EAT,Bolo pronto.
+TACO4:18,READY_TO_EAT,Bolo pronto.
+TACO4:20,PREPARED_DISH,Preparação culinária (protocolo no Apêndice 2 da TACO).
+TACO4:21,READY_TO_EAT,Cereal matinal pronto para consumo.
+TACO4:22,READY_TO_EAT,Cereal matinal pronto para consumo.
+TACO4:23,DRIED,"Produto em pó para preparo (mingau, vitamina, curau, farinha láctea)."
+TACO4:24,DRIED,"Produto em pó para preparo (mingau, vitamina, curau, farinha láctea)."
+TACO4:25,READY_TO_EAT,Cereal matinal pronto para consumo.
+TACO4:26,READY_TO_EAT,Cereal matinal pronto para consumo.
+TACO4:29,PREPARED_DISH,Preparação culinária (protocolo no Apêndice 2 da TACO).
+TACO4:30,DRIED,"Produto em pó para preparo (mingau, vitamina, curau, farinha láctea)."
+TACO4:31,RAW,"Farinha/fécula/polvilho sem cocção; mesma convenção da TACO para 'Farinha, de mandioca, crua' e 'Milho, fubá, cru'."
+TACO4:32,RAW,"Farinha/fécula/polvilho sem cocção; mesma convenção da TACO para 'Farinha, de mandioca, crua' e 'Milho, fubá, cru'."
+TACO4:33,RAW,"Farinha/fécula/polvilho sem cocção; mesma convenção da TACO para 'Farinha, de mandioca, crua' e 'Milho, fubá, cru'."
+TACO4:34,DRIED,Farinha de rosca: pão seco moído.
+TACO4:35,RAW,"Farinha/fécula/polvilho sem cocção; mesma convenção da TACO para 'Farinha, de mandioca, crua' e 'Milho, fubá, cru'."
+TACO4:36,DRIED,"Produto em pó para preparo (mingau, vitamina, curau, farinha láctea)."
+TACO4:39,DRIED,"Macarrão instantâneo como vendido (bloco seco, antes do preparo)."
+TACO4:48,READY_TO_EAT,Pão pronto para consumo.
+TACO4:49,READY_TO_EAT,Pão pronto para consumo.
+TACO4:50,READY_TO_EAT,Pão pronto para consumo.
+TACO4:51,READY_TO_EAT,Pão pronto para consumo.
+TACO4:52,READY_TO_EAT,Pão pronto para consumo.
+TACO4:53,READY_TO_EAT,Pão pronto para consumo.
+TACO4:54,READY_TO_EAT,Pão pronto para consumo.
+TACO4:61,PREPARED_DISH,Pipoca estourada com óleo (protocolo no Apêndice 2 da TACO).
+TACO4:94,SAUTEED,"Batata cozida e depois refogada na margarina (protocolo 'Batata, inglesa, sauté', Apêndice 2 da TACO)."
+TACO4:99,READY_TO_EAT,"Biscoito industrializado, consumido como comprado."
+TACO4:123,RAW,"Farinha/fécula/polvilho sem cocção; mesma convenção da TACO para 'Farinha, de mandioca, crua' e 'Milho, fubá, cru'."
+TACO4:124,RAW,"Farinha/fécula/polvilho sem cocção; mesma convenção da TACO para 'Farinha, de mandioca, crua' e 'Milho, fubá, cru'."
+TACO4:131,PREPARED_DISH,"Preparação culinária (farofa, salada, escabeche, omelete)."
+TACO4:146,RAW,"Farinha/fécula/polvilho sem cocção; mesma convenção da TACO para 'Farinha, de mandioca, crua' e 'Milho, fubá, cru'."
+TACO4:158,READY_TO_EAT,Derivado industrializado de tomate.
+TACO4:159,READY_TO_EAT,Derivado industrializado de tomate.
+TACO4:160,READY_TO_EAT,Derivado industrializado de tomate.
+TACO4:161,PREPARED_DISH,"Preparação culinária (farofa, salada, escabeche, omelete)."
+TACO4:165,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:167,READY_TO_EAT,Polpa de açaí adoçada (produto comercial pronto).
+TACO4:168,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:170,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:176,READY_TO_EAT,Doce de fruta pronto para consumo.
+TACO4:185,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:187,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:188,READY_TO_EAT,Suco concentrado envasado (produto comercial).
+TACO4:193,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:198,READY_TO_EAT,Doce de fruta pronto para consumo.
+TACO4:199,READY_TO_EAT,Doce de fruta pronto para consumo.
+TACO4:202,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:209,READY_TO_EAT,Suco natural da fruta.
+TACO4:211,READY_TO_EAT,Suco natural da fruta.
+TACO4:213,READY_TO_EAT,Suco natural da fruta.
+TACO4:215,READY_TO_EAT,Suco natural da fruta.
+TACO4:217,READY_TO_EAT,Suco natural da fruta.
+TACO4:218,READY_TO_EAT,Suco natural da fruta.
+TACO4:219,READY_TO_EAT,Suco natural da fruta.
+TACO4:224,READY_TO_EAT,Doce de fruta pronto para consumo.
+TACO4:227,READY_TO_EAT,Doce de fruta pronto para consumo.
+TACO4:230,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:233,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:234,READY_TO_EAT,Suco concentrado envasado (produto comercial).
+TACO4:248,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:252,READY_TO_EAT,Suco natural da fruta.
+TACO4:255,RAW,"Polpa de fruta congelada, sem cocção."
+TACO4:258,READY_TO_EAT,Suco concentrado envasado (produto comercial).
+TACO4:295,RAW,Peixe fresco sem cocção (não há protocolo de preparo no Apêndice 2).
+TACO4:309,PREPARED_DISH,"Preparação culinária (farofa, salada, escabeche, omelete)."
+TACO4:323,READY_TO_EAT,Embutido/frios prontos para consumo.
+TACO4:324,DRIED,Caldo em tablete (concentrado desidratado).
+TACO4:325,DRIED,Caldo em tablete (concentrado desidratado).
+TACO4:340,FRIED,À milanesa: empanado e frito em óleo (protocolo no Apêndice 2 da TACO).
+TACO4:401,FRIED,À milanesa: empanado e frito em óleo (protocolo no Apêndice 2 da TACO).
+TACO4:424,READY_TO_EAT,Embutido/frios prontos para consumo.
+TACO4:438,READY_TO_EAT,Embutido/frios prontos para consumo.
+TACO4:439,READY_TO_EAT,Embutido/frios prontos para consumo.
+TACO4:443,READY_TO_EAT,Embutido/frios prontos para consumo.
+TACO4:484,PREPARED_DISH,"Preparação culinária (farofa, salada, escabeche, omelete)."
+TACO4:514,RAW,Fermento biológico fresco em tablete.
+TACO4:516,READY_TO_EAT,Condimento usado como comprado.
+TACO4:517,READY_TO_EAT,Condimento usado como comprado.
+TACO4:518,READY_TO_EAT,Condimento usado como comprado.
+TACO4:519,READY_TO_EAT,Condimento usado como comprado.
+TACO4:559,RAW,Ervilha em vagem in natura (não há protocolo de preparo no Apêndice 2).
+TACO4:579,READY_TO_EAT,Doce de amendoim pronto.
+TACO4:580,READY_TO_EAT,Doce de amendoim pronto.
+TACO4:581,RAW,"Farinha/fécula/polvilho sem cocção; mesma convenção da TACO para 'Farinha, de mandioca, crua' e 'Milho, fubá, cru'."
+TACO4:582,READY_TO_EAT,Derivado de soja pronto para consumo.
+TACO4:584,READY_TO_EAT,Derivado de soja pronto para consumo.
+TACO4:593,RAW,Semente in natura.
+TACO4:594,RAW,Semente in natura.

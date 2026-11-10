@@ -1,0 +1,18 @@
+# Itens do USDA SR Legacy usados SOMENTE para lacunas da TACO (verificado: não há equivalente na TACO 4ª ed.).
+# name/base_name são traduções para exibição; a descrição original em inglês fica em sourceDescription.
+# base_name vazio = o próprio nome (variações com o mesmo preparo não podem compartilhar nome base, regra E13).
+fdc_id,name,base_name,category,preparation,note
+175176,"Tilápia, crua",Tilápia,PROTEINS,RAW,
+175177,"Tilápia, cozida em calor seco (assada ou grelhada)",Tilápia,PROTEINS,ROASTED,"No USDA, ""cooked, dry heat"" abrange assar, grelhar e tostar sem adição de gordura."
+172179,"Queijo cottage, tradicional",,PROTEINS,READY_TO_EAT,
+172182,"Queijo cottage, light (2% de gordura)",,PROTEINS,READY_TO_EAT,
+169737,"Macarrão de trigo, cozido, sem sal (massa enriquecida)",Macarrão de trigo,CARBS,COOKED,"Farinha de trigo enriquecida com ferro e ácido fólico, como a usada no Brasil."
+169751,"Macarrão de trigo, cozido, com sal (massa enriquecida)","Macarrão de trigo, com sal",CARBS,COOKED,"Farinha de trigo enriquecida com ferro e ácido fólico, como a usada no Brasil."
+172470,"Pasta de amendoim, integral, sem sal",,FATS,READY_TO_EAT,
+174266,"Pasta de amendoim, com sal",,FATS,READY_TO_EAT,
+171646,Granola caseira,Granola,CARBS,ROASTED,Receita caseira de referência do USDA; granolas comerciais variam muito: prefira o rótulo.
+173177,Whey protein isolado (pó),,PROTEINS,DRIED,Valor genérico; a composição varia entre marcas: prefira o rótulo.
+173180,Proteína em pó à base de soro de leite (whey),,PROTEINS,DRIED,Valor genérico; a composição varia entre marcas: prefira o rótulo.
+170273,"Chocolate amargo, 70–85% de cacau",,OTHERS,READY_TO_EAT,
+170272,"Chocolate amargo, 60–69% de cacau",,OTHERS,READY_TO_EAT,
+170894,"Iogurte grego, natural, desnatado",Iogurte grego,PROTEINS,READY_TO_EAT,"Iogurte grego não é o mesmo que ""iogurte proteico"" de marca; para esse, use o rótulo."

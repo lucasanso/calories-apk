@@ -82,10 +82,10 @@ Convenção: `PK` chave primária, `FK` chave estrangeira, `UQ` único, `IX` ín
 | Coluna | Tipo | Notas |
 |---|---|---|
 | id | INTEGER PK | |
-| code | TEXT UQ | `TACO4`, `TBCA7`, `USDA_FDC_SR`, `USDA_FDC_FOUNDATION`, `LABEL` (rótulo), `USER` |
+| code | TEXT UQ | `TACO4`, `USDA_SR` (biblioteca); `USER` para personalizados. Novas fontes ganham um código novo. |
 | name | TEXT | Nome completo |
-| edition | TEXT? | Por exemplo, "4ª edição revisada e ampliada" ou "7.2" |
-| publisher | TEXT? | NEPA/UNICAMP, FoRC/USP, USDA ARS |
+| edition | TEXT? | Por exemplo, "4ª edição revisada e ampliada" ou "SR Legacy, abril de 2018" |
+| publisher | TEXT? | NEPA/UNICAMP, USDA ARS |
 | year | INTEGER? | |
 | url | TEXT? | Só referência; o app nunca acessa a URL |
 | license | TEXT | Texto curto da licença ou permissão |
@@ -109,7 +109,7 @@ Convenção: `PK` chave primária, `FK` chave estrangeira, `UQ` único, `IX` ín
 |---|---|---|
 | id | INTEGER PK | Autoincremento |
 | origin | TEXT IX | `LIBRARY` ou `CUSTOM` |
-| sourceKey | TEXT? UQ | Chave estável da biblioteca: `TACO4:<nº do item>`, `TBCA7:<código>`, `FDC:<fdcId>`. `NULL` para personalizados. |
+| sourceKey | TEXT? UQ | Chave estável da biblioteca, igual à `key` do asset: `TACO4:<nº do item>` ou `USDA_SR:<fdcId>`. `NULL` para personalizados. |
 | dataSourceId | INTEGER FK → data_source (RESTRICT) IX | |
 | sourceCode | TEXT? | Código original na fonte |
 | sourceDescription | TEXT? | Descrição original, sem alteração |
@@ -216,7 +216,7 @@ Medidas da biblioteca só entram com fonte documentada. Sem fonte, o alimento of
 | foodName | TEXT | **Snapshot** |
 | brand | TEXT? | **Snapshot** |
 | preparation | TEXT | **Snapshot** |
-| dataSourceCode | TEXT | **Snapshot** (`TACO4`, `CUSTOM`…) |
+| dataSourceCode | TEXT | **Snapshot** (`TACO4`, `USDA_SR`, `USER`) |
 | inputAmount | REAL | O que o usuário digitou |
 | inputUnit | TEXT | `GRAM`, `MILLILITER` ou `PORTION` |
 | portionLabel | TEXT? | Se `inputUnit = PORTION` |

@@ -94,7 +94,7 @@ Ações:
   - Campo de busca focado ao abrir.
   - Abas: **Recentes · Favoritos · Biblioteca · Meus alimentos**.
   - Resultados agrupados por nome base, com botões de preparo (Cru · Cozido · Grelhado).
-  - Cada linha mostra a fonte (TACO, TBCA, USDA, Meu) e kcal/100 g.
+  - Cada linha mostra a fonte (TACO, USDA, Meu) e kcal/100 g.
 - **QuantitySheet** (bottom sheet):
   - Campo numérico pré-preenchido com a última quantidade usada.
   - Unidade: g; ml só com densidade; porções, se houver.
@@ -145,7 +145,7 @@ Ações:
 - **Refeições:** renomear, reordenar, horário, ativar ou desativar, lembrete.
 - **Aparência:** tema (sistema, claro, escuro) e Material You (cores do papel de parede).
 - **Dados:** exportar CSV, exportar JSON, criar backup, restaurar, exportar planos, backup automático em pasta.
-- **Fontes e licenças:** citações TACO, TBCA e USDA, versão da biblioteca e licenças das bibliotecas de código aberto.
+- **Fontes e licenças:** citações TACO e USDA, versão da biblioteca e licenças das bibliotecas de código aberto.
 - **Sobre e privacidade:** sem internet, sem conta, sem anúncios, dados só no aparelho.
 
 ## 5.3 Fluxos principais

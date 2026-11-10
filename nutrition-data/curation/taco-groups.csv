@@ -1,0 +1,18 @@
+# Grupo da TACO 4ª ed. → categoria padrão do app e preparo padrão quando a descrição não indica preparo.
+# default_preparation vazio = cada item sem palavra de preparo precisa de decisão em preparation-overrides.csv.
+group,category,default_preparation
+Cereais e derivados,CARBS,
+"Verduras, hortaliças e derivados",VEGETABLES,
+Frutas e derivados,CARBS,
+Gorduras e óleos,FATS,READY_TO_EAT
+Pescados e frutos do mar,PROTEINS,
+Carnes e derivados,PROTEINS,
+Leite e derivados,PROTEINS,READY_TO_EAT
+Bebidas (alcoólicas e não alcoólicas),OTHERS,READY_TO_EAT
+Ovos e derivados,PROTEINS,
+Produtos açucarados,OTHERS,READY_TO_EAT
+Miscelâneas,OTHERS,
+Outros alimentos industrializados,OTHERS,READY_TO_EAT
+Alimentos preparados,OTHERS,PREPARED_DISH
+Leguminosas e derivados,CARBS,
+Nozes e sementes,FATS,

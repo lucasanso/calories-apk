@@ -1,0 +1,4 @@
+# Valores publicados fisicamente impossíveis. O valor é descartado (vira "sem dado"); nunca é substituído.
+# A observação (note) é exibida no detalhe do alimento no app.
+key,nutrient,note,reason
+TACO4:368,saturatedFatG,"A TACO publica 9,7 g de gordura saturada para 2,4 g de lipídios totais (os ácidos graxos publicados somam 17,6 g). O valor é inconsistente e foi descartado.","TACO 4ª ed.: Tabela 1 (p. 51 do arquivo PDF) lipídeos 2,4 g; Tabela 2 (p. 85 do arquivo PDF) saturados 9,7, monoinsaturados 7,7, poli-insaturados 0,2. Planilha e PDF concordam; a inconsistência é da fonte."

@@ -1,0 +1,5 @@
+# Divergências conhecidas entre a planilha e o PDF oficiais da TACO 4ª ed. (ambos do NEPA/UNICAMP).
+# Toda divergência encontrada pela checagem cruzada precisa estar aqui, e toda linha aqui precisa ser observada.
+number,field,workbook,pdf,decision,reason
+69,description,"Abóbora, pescoço, crua","Abobora, pescoço, crua",USE_WORKBOOK,Erro de acentuação no PDF; os demais itens de abóbora são grafados com acento nos dois arquivos.
+540,description,L,Feijoada,USE_PDF,Descrição truncada na planilha; ver source-corrections.csv.

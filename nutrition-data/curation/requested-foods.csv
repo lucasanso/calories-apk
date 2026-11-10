@@ -1,0 +1,62 @@
+# Lista inicial do requisito → alimentos da biblioteca. Status: OK (TACO), USDA (lacuna na TACO), LABEL (rótulo), GENERIC (sem item único).
+request,category,keys,status,note
+Peito de frango,PROTEINS,TACO4:406;TACO4:407;TACO4:408;TACO4:409;TACO4:410,OK,"Com e sem pele; cru, cozido, grelhado, assado."
+Coxa de frango,PROTEINS,TACO4:396;TACO4:397;TACO4:398;TACO4:399,OK,"Com e sem pele; crua, cozida, assada."
+Carne bovina magra,PROTEINS,TACO4:376;TACO4:377;TACO4:369;TACO4:370;TACO4:351;TACO4:352;TACO4:363;TACO4:364;TACO4:371;TACO4:372,GENERIC,Não existe item genérico; a busca por 'carne magra' leva aos cortes magros da TACO.
+Patinho,PROTEINS,TACO4:376;TACO4:377,OK,Sem gordura; cru e grelhado.
+Acém,PROTEINS,TACO4:326;TACO4:327;TACO4:328;TACO4:329,OK,Moído e sem gordura; cru e cozido.
+Alcatra,PROTEINS,TACO4:369;TACO4:370,OK,A TACO traz 'miolo de alcatra'.
+Carne moída,PROTEINS,TACO4:326;TACO4:327,GENERIC,A composição depende do corte; a TACO traz acém moído (cru e cozido).
+Tilápia,PROTEINS,USDA_SR:175176;USDA_SR:175177,USDA,Ausente na TACO 4ª ed.
+Salmão,PROTEINS,TACO4:315;TACO4:316;TACO4:317,OK,
+Atum,PROTEINS,TACO4:277;TACO4:278,OK,Fresco cru e em conserva.
+Sardinha,PROTEINS,TACO4:318;TACO4:319;TACO4:320;TACO4:321,OK,
+Ovo inteiro,PROTEINS,TACO4:488;TACO4:489;TACO4:490,OK,"Cru, cozido e frito."
+Clara de ovo,PROTEINS,TACO4:486,OK,A TACO traz só a clara cozida.
+Leite,PROTEINS,TACO4:458;TACO4:457;TACO4:459;TACO4:456,OK,Valores por 100 g (a TACO não usa ml).
+Iogurte natural,PROTEINS,TACO4:448;TACO4:449,OK,
+Queijo cottage,PROTEINS,USDA_SR:172179;USDA_SR:172182,USDA,Ausente na TACO 4ª ed.
+Whey protein,PROTEINS,USDA_SR:173177;USDA_SR:173180,USDA,Genérico; a composição varia muito por marca: prefira o rótulo.
+Arroz branco,CARBS,TACO4:3;TACO4:4;TACO4:5;TACO4:6,OK,Tipo 1 e tipo 2; cru e cozido.
+Arroz integral,CARBS,TACO4:1;TACO4:2,OK,
+Feijão carioca,CARBS,TACO4:561;TACO4:562,OK,
+Feijão preto,CARBS,TACO4:567;TACO4:568,OK,
+Batata inglesa,CARBS,TACO4:91;TACO4:92;TACO4:93;TACO4:94,OK,
+Batata-doce,CARBS,TACO4:88;TACO4:89,OK,
+Mandioca,CARBS,TACO4:129;TACO4:130;TACO4:132,OK,
+Macarrão,CARBS,TACO4:40;TACO4:41;USDA_SR:169737;USDA_SR:169751,USDA,Cru na TACO; cozido só no USDA.
+Aveia,CARBS,TACO4:7,OK,"Flocos, crua."
+Pão francês,CARBS,TACO4:53,OK,
+Pão integral,CARBS,TACO4:52,OK,Pão de forma integral.
+Tapioca,CARBS,TACO4:551,LABEL,"A TACO traz 'Tapioca, com manteiga'; para a goma hidratada pura, cadastre pelo rótulo."
+Cuscuz,CARBS,TACO4:533;TACO4:534,OK,Cuscuz de milho cozido e cuscuz paulista.
+Banana,CARBS,TACO4:175;TACO4:177;TACO4:178;TACO4:179;TACO4:180;TACO4:181;TACO4:182,OK,
+Maçã,CARBS,TACO4:221;TACO4:222,OK,
+Mamão,CARBS,TACO4:225;TACO4:226,OK,
+Laranja,CARBS,TACO4:208;TACO4:210;TACO4:212;TACO4:214;TACO4:216,OK,
+Azeite de oliva,FATS,TACO4:260,OK,
+Pasta de amendoim,FATS,USDA_SR:172470;USDA_SR:174266,USDA,Ausente na TACO 4ª ed.
+Amendoim,FATS,TACO4:557;TACO4:558,OK,
+Castanha-do-pará,FATS,TACO4:589,OK,A TACO usa 'Castanha-do-Brasil'.
+Castanha-de-caju,FATS,TACO4:588,OK,
+Abacate,FATS,TACO4:163,OK,
+Manteiga,FATS,TACO4:261;TACO4:262,OK,
+Óleo de soja,FATS,TACO4:272,OK,
+Alface,VEGETABLES,TACO4:77;TACO4:78;TACO4:79;TACO4:80,OK,
+Tomate,VEGETABLES,TACO4:157,OK,
+Cenoura,VEGETABLES,TACO4:109;TACO4:110,OK,
+Brócolis,VEGETABLES,TACO4:100;TACO4:101,OK,
+Couve,VEGETABLES,TACO4:115;TACO4:116,OK,
+Abobrinha,VEGETABLES,TACO4:70;TACO4:71;TACO4:72;TACO4:73,OK,
+Pepino,VEGETABLES,TACO4:142,OK,
+Beterraba,VEGETABLES,TACO4:97;TACO4:98,OK,
+Espinafre,VEGETABLES,TACO4:119;TACO4:120,OK,
+Repolho,VEGETABLES,TACO4:149;TACO4:150;TACO4:151,OK,
+Café,OTHERS,TACO4:471;TACO4:511,OK,Infusão 10% e pó torrado.
+Açúcar,OTHERS,TACO4:492;TACO4:493;TACO4:494,OK,
+Mel,OTHERS,TACO4:507,OK,
+Chocolate amargo,OTHERS,TACO4:498;USDA_SR:170273;USDA_SR:170272,USDA,A TACO traz 'meio amargo'; amargo 60–85% vem do USDA.
+Iogurte proteico,PROTEINS,USDA_SR:170894,LABEL,"Produto de marca: cadastre pelo rótulo. Iogurte grego (USDA) disponível como referência, não como equivalente."
+Granola,CARBS,USDA_SR:171646,LABEL,Receita caseira do USDA como referência; granolas comerciais variam muito: prefira o rótulo.
+Suco de laranja,OTHERS,TACO4:209;TACO4:211;TACO4:213;TACO4:215;TACO4:217,OK,
+Água de coco,OTHERS,TACO4:478,OK,"A TACO usa 'Coco, água de'."

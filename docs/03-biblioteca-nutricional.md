@@ -1,345 +1,245 @@
-# 3. Biblioteca nutricional inicial
+# 3. Biblioteca nutricional
 
-> **Nenhum valor nutricional foi digitado nesta fase.** Este documento define *como* a biblioteca será construída e verificada na Fase 2: fontes, permissões, regras de normalização, validação e importação no app.
+> **Fase 2 concluída.** A biblioteca inicial tem **611 alimentos**: os 597 itens da TACO 4ª edição completa e 14 itens do USDA que cobrem lacunas da TACO.
+>
+> - Os valores vêm dos arquivos oficiais, sem nenhum valor digitado à mão.
+> - Nada foi arredondado nem recalculado além do que a própria fonte publica.
+> - Tudo é reproduzível com `./gradlew :tools:food-importer:generateFoodLibrary`.
+>
+> O relatório completo da última importação está em [`nutrition-data/reports/import-report.md`](../nutrition-data/reports/import-report.md).
 
-## 3.1 Fontes e ordem de prioridade
+## 3.1 Fontes usadas
 
-| Prioridade | Fonte | Papel | Escopo na v1 |
+| Fonte | Arquivos oficiais (versionados em `nutrition-data/raw/`) | Papel | Itens |
 |---|---|---|---|
-| 1 | **TACO** — Tabela Brasileira de Composição de Alimentos, 4ª ed. revisada e ampliada (NEPA/UNICAMP, 2011) | Base principal: dados analíticos de alimentos consumidos no Brasil, com preparo explícito no nome | **Tabela completa** (todos os itens da 4ª edição) |
-| 2 | **TBCA** — Tabela Brasileira de Composição de Alimentos (FoRC/USP), versão 7.x | Complemento para lacunas da TACO (itens e preparos ausentes) | **Só uma lista curada de lacunas**, e só depois de confirmar as condições de uso (§3.2) |
-| 3 | **USDA FoodData Central** — SR Legacy e Foundation Foods (USDA ARS) | Último recurso para itens sem equivalente nas tabelas brasileiras | Só uma lista curada, marcada como "referência internacional" |
-| — | **Rótulo do produto** | Produtos de marca (whey, iogurte proteico, granola de marca) | Não entra na biblioteca. O usuário cadastra pelo fluxo "Criar a partir do rótulo". |
+| **TACO**: Tabela Brasileira de Composição de Alimentos, 4ª ed. revisada e ampliada (NEPA/UNICAMP, 2011) | Planilha `Taco-4a-Edicao.xlsx` e PDF `taco_4_edicao_ampliada_e_revisada.pdf`, ambos do site do NEPA | Base principal | 597 (tabela completa) |
+| **USDA FoodData Central**: SR Legacy (abril de 2018) | `FoodData_Central_sr_legacy_food_csv_2018-04.zip` | Só lacunas da TACO, marcadas como "referência internacional" | 14 |
+| **TBCA** (FoRC/USP) | — | **Não usada** (§3.2) | 0 |
 
-Princípios:
-- **Fonte brasileira primeiro.** Um mesmo alimento não é importado de duas fontes. Se a TACO tem o item no preparo desejado, a TBCA e o USDA não são usados para ele. Isso evita resultados duplicados na busca.
-- **Valores copiados exatamente da fonte.** Nada é arredondado, recalculado ou "corrigido". Nutriente ausente na fonte fica `NULL`.
-- **Cada alimento identifica sua fonte** (`data_source`), o código original (`sourceCode`) e a descrição original (`sourceDescription`). A tela de detalhe mostra a citação completa.
-- **Itens genéricos não viram média.** "Carne bovina magra" não tem composição única. A busca por esse termo leva, via sinônimos, aos cortes magros reais (patinho, coxão mole, lagarto, filé mignon, miolo de alcatra), e o usuário escolhe um deles.
+URLs, data de acesso e SHA-256 de cada arquivo estão em [`nutrition-data/sources.lock.json`](../nutrition-data/sources.lock.json). O importador recusa qualquer arquivo cujo hash não confira.
 
-## 3.2 Condições de uso e redistribuição
+## 3.2 Condições de uso, verificadas nos documentos oficiais
 
-Pesquisa feita em 10/11/2026. Os sites oficiais (`nepa.unicamp.br`, `tbca.net.br`, `fdc.nal.usda.gov`) **estão bloqueados pela política de rede deste ambiente de desenvolvimento**, então a verificação usou cópias e índices públicos. As confirmações pendentes são **pré-requisito da Fase 2** (§3.10).
+| Fonte | Texto oficial | Decisão |
+|---|---|---|
+| TACO | PDF oficial, p. ii: *"Tabela Brasileira de Composição de Alimentos – TACO é uma publicação do NEPA. É permitida a reprodução total ou parcial do material, desde que seja citada a fonte."* | ✅ Incorporada integralmente, com citação. |
+| USDA FDC | fdc.nal.usda.gov: *"USDA FoodData Central data are in the public domain and they are not copyrighted. They are published under CC0 1.0 Universal (CC0 1.0)."* O USDA pede citação. | ✅ Incorporado para as lacunas, com citação. |
+| TBCA 7.3 (2025) | tbca.net.br, "Como citar": *"É estimulada a divulgação de dados, sem fins comerciais, sendo necessário citar a fonte"* e também *"Não é permitida a reprodução total ou parcial do material. […] Não é permitida a comercialização. Não é permitido a alteração total ou mesmo parcial do conteúdo."* A obra está registrada como direito autoral. | ❌ Não incorporada. |
 
-| Fonte | O que foi encontrado | Status | Consequência |
-|---|---|---|---|
-| TACO 4ª ed. | A página de créditos da publicação diz: *"É permitida a reprodução total ou parcial desta obra, desde que citada a fonte."* (cópia da 4ª ed. hospedada no e-Disciplinas/USP). | Permissão clara. **Confirmar no PDF oficial baixado do NEPA.** | Pode ser incorporada integralmente, com citação. |
-| TBCA 7.x | Um documento oficial da TBCA (*Tabelas Complementares — Resposta glicêmica*, versão 7.2, 2023) traz licença **Creative Commons BY-NC-ND 4.0** e a citação sugerida "Tabela Brasileira de Composição de Alimentos (TBCA). Universidade de São Paulo (USP). Food Research Center (FoRC). Versão 7.2. São Paulo, 2023". Uma página do site menciona versão 7.3. **Não foi possível ler o termo de uso da base on-line.** | **Pendente.** Não se sabe se a licença do documento cobre a base de dados. | Uso **condicional** (ver abaixo). |
-| USDA FoodData Central | Dados em domínio público sob **CC0 1.0**. O USDA pede citação: "U.S. Department of Agriculture, Agricultural Research Service. FoodData Central, 2019. fdc.nal.usda.gov." | Permissão clara. | Pode ser incorporado, com citação. |
+**Por que a TBCA ficou de fora:** este repositório é **público**. Gravar valores da TBCA no asset seria reprodução pública de parte do material, o que o termo proíbe expressamente, mesmo sem fins comerciais.
 
-**Regras para a TBCA**, se a licença BY-NC-ND se aplicar à base:
-- **BY:** citar a TBCA, a versão e a data de acesso em cada alimento e na tela "Fontes e licenças".
-- **NC:** o Calories é pessoal e sem fins comerciais, sem venda nem anúncios. Se isso mudar, a TBCA precisa sair ou ser licenciada.
-- **ND:** os valores são reproduzidos sem modificação. A CC 4.0 (§2(a)(4)) permite mudar o formato (de página web para JSON e SQLite), mas não permite recalcular, arredondar ou combinar valores da TBCA com outros.
-- A importação fica **restrita à lista de lacunas**, para reduzir a dependência dessa fonte.
-- Se o termo de uso da base proibir a incorporação, os itens TBCA saem da lista. A lacuna passa para o USDA ou para cadastro pelo rótulo. Basta remover as linhas `TBCA7` da lista de inclusão e regerar o asset.
-- Também é possível pedir autorização à equipe da TBCA pelo contato oficial (tbca.contato@usp.br).
+O uso pessoal da informação, com citação, é permitido. Se quiser algum alimento que só existe na TBCA, você pode cadastrá-lo como **alimento personalizado** no app, informando "TBCA" como fonte. Outra saída é tornar o repositório privado e pedir autorização à equipe da TBCA (tbca.contato@usp.br).
 
-Isto é uma análise técnica de licenças, **não um parecer jurídico**.
+Isto é uma leitura técnica dos termos, não um parecer jurídico.
 
-### Citações que aparecerão no app
+### Citações exibidas no app
 
-- NÚCLEO DE ESTUDOS E PESQUISAS EM ALIMENTAÇÃO — NEPA. *Tabela Brasileira de Composição de Alimentos — TACO*. 4. ed. rev. e ampl. Campinas: NEPA/UNICAMP, 2011. 161 p.
-- *Tabela Brasileira de Composição de Alimentos (TBCA)*. Universidade de São Paulo (USP). Food Research Center (FoRC). Versão 7.x. São Paulo. Acesso em: ‹data›. (Versão e data exatas registradas no `sources.lock.json`.)
-- U.S. Department of Agriculture, Agricultural Research Service. *FoodData Central*. fdc.nal.usda.gov. (Conjunto de dados e data de publicação exatos registrados no `sources.lock.json`.)
+- NÚCLEO DE ESTUDOS E PESQUISAS EM ALIMENTAÇÃO – NEPA. *Tabela Brasileira de Composição de Alimentos – TACO*. 4. ed. rev. e ampl. Campinas: NEPA/UNICAMP, 2011. 161 p.
+- U.S. Department of Agriculture, Agricultural Research Service, Beltsville Human Nutrition Research Center. *FoodData Central: SR Legacy (2018-04)*. Disponível em: https://fdc.nal.usda.gov/. Acesso em: 10 nov. 2026.
 
-## 3.3 Características das fontes que afetam a modelagem
+## 3.3 Metodologia das fontes (confirmada no texto oficial)
 
-Os itens abaixo serão **confirmados no texto metodológico oficial de cada fonte** no início da Fase 2. O importador só será finalizado depois disso.
+| Tema | O que a TACO diz (PDF oficial) | Tratamento no Calories |
+|---|---|---|
+| Base | Tabelas "por 100 gramas de parte comestível" | `reference = 100 GRAM` para todos os itens, inclusive bebidas (ver 04, §4.4 sobre ml) |
+| Carboidrato | *"calculado pela diferença entre 100 e a soma das porcentagens de água, proteína, lipídeos totais, cinzas e álcool […] incluem a fibra alimentar total"* | Exibido como **carboidrato total**. Na USDA a base é a mesma ("Carbohydrate, by difference"). |
+| Energia | *"sistema Atwater, utilizando os coeficientes específicos […] Para o álcool, 6,93 kcal/g"* | Usada como publicada. Por isso 4P + 4C + 9G pode divergir: são 42 avisos W1, todos mantidos. |
+| `Tr` | Traço: valor arredondado para zero ou abaixo do limite de quantificação | `TRACE`: exibido "Tr", soma 0 |
+| `NA` | Não aplicável | `NOT_APPLICABLE`: exibido "NA", soma 0 |
+| `*` | *"as análises estão sendo reavaliadas"* | `NOT_AVAILABLE` + observação |
+| Célula em branco | *"análises não solicitadas"* | `NOT_AVAILABLE`: exibido "—", torna o total "parcial" |
+| Gordura saturada | Tabela 2 (ácidos graxos), separada; 423 dos 597 itens | Junção pelo número do item. Itens sem análise ficam sem dado, salvo quando os lipídios totais são traço (então a saturada também é traço, com observação). |
 
-| Tema | Tratamento previsto |
-|---|---|
-| **Base de referência** | TACO e TBCA informam valores por **100 g de parte comestível**, inclusive bebidas como leite e suco. Assim, `referenceUnit = GRAM` para a biblioteca, e mililitros só são aceitos com densidade documentada (ver 04, §4.4). |
-| **Carboidrato** | Na TACO, o carboidrato é calculado **por diferença** e inclui a fibra. A TBCA publica "carboidrato total" e "carboidrato disponível". O USDA publica "Carbohydrate, by difference". O app usa **carboidrato total** em todas as fontes, para ficarem comparáveis, e registra a base em `data_source.carbohydrateBasis`. O "carboidrato disponível" da TBCA não é usado na v1. |
-| **Símbolos** | "Tr" (traço): gravado como 0 com bit em `traceMask`, exibido como "Tr". "NA" (não aplicável): 0 com bit em `notApplicableMask`, exibido como "NA". Asterisco, traço ou vazio (não analisado ou em análise): `NULL`. Qualquer outro símbolo **interrompe** a importação até ser classificado. |
-| **Gordura saturada** | Na TACO, os ácidos graxos estão numa tabela separada da composição centesimal. O importador junta as duas pelo número do item. Item sem linha de ácidos graxos fica com `saturatedFatG = NULL`. |
-| **Energia** | Importada como publicada (kcal), nunca recalculada. A TACO também publica kJ, o que permite um teste de transcrição: kcal × 4,184 deve bater com o kJ (§3.7). |
-| **Sódio** | mg/100 g, como na fonte. |
-| **Preparo** | Na TACO, o preparo faz parte do nome ("…, cru", "…, cozido", "…, grelhado"). Cada preparo é um **registro separado**. O importador nunca mescla preparos. |
-
-## 3.4 Pipeline reproduzível de importação
+## 3.4 Pipeline de importação
 
 ```mermaid
 flowchart LR
-    A["raw/<br/>arquivos oficiais<br/>(sem modificação)"] -->|SHA-256 conferido<br/>contra sources.lock.json| B["Leitores por fonte<br/>TacoReader · TbcaReader · FdcReader"]
-    B --> C["RawRecord<br/>(strings originais)"]
-    C --> D["Normalização<br/>números pt-BR, símbolos,<br/>unidades, junção de tabelas"]
-    D --> E["Classificação<br/>preparo, categoria,<br/>nome base, sinônimos"]
-    CUR["curation/*.csv<br/>(decisões humanas revisáveis)"] --> E
-    E --> F{"Validação<br/>erros bloqueiam<br/>avisos vão ao relatório"}
-    GOLD["golden-values.csv"] --> F
-    F -->|ok| G["food_library.json<br/>(determinístico)"]
-    F --> H["reports/import-report.md<br/>+ diff da versão anterior"]
-    G --> I["app/src/main/assets/library/"]
+    LOCK["sources.lock.json<br/>(SHA-256)"] --> V{"Integridade"}
+    RAW["raw/<br/>planilha + PDF TACO<br/>CSV USDA"] --> V
+    V --> X["Leitura da planilha<br/>(leitor .xlsx próprio)"]
+    X --> N["Normalização<br/>valor publicado = arredondamento<br/>às casas do PDF"]
+    N --> CC{"Checagem cruzada<br/>planilha × PDF<br/>(PDFBox, por coordenada)"}
+    RAWU["CSV USDA"] --> U["Leitura USDA<br/>(só fdc_id curados)"]
+    CUR["curation/*.csv"] --> A["Montagem<br/>preparo, categoria,<br/>nome base, sinônimos"]
+    CC --> A
+    U --> A
+    A --> VAL{"Validação<br/>E1–E13, W1–W5<br/>valores de ouro"}
+    VAL -->|0 erros| OUT["app/src/main/assets/library/<br/>food_library.json"]
+    VAL --> REP["reports/import-report.md"]
 ```
 
-Execução: `./gradlew :tools:food-importer:run`. O comando:
+Comandos:
 
-1. **Confere a integridade.** Cada arquivo em `nutrition-data/raw/` precisa ter o SHA-256 registrado em `sources.lock.json` (URL, data de acesso, versão e licença). Arquivo divergente interrompe a execução.
-2. **Lê cada fonte.**
-   - **TACO:** usa a planilha oficial do NEPA, se publicada. Se houver só o PDF, as tabelas são extraídas uma vez com `tabula-java` (MIT, JVM). O CSV extraído é commitado em `raw/taco-4ed/extracted/` com o comando usado. Uma transcrição comunitária independente pode ser usada **só para comparação** (dupla digitação): toda divergência é resolvida olhando o PDF e registrada.
-   - **TBCA:** se não houver download oficial em lote, os itens da lista de lacunas são transcritos da página de cada alimento para `raw/tbca-7.x/manual/<código>.csv`, com URL e data de acesso. Uma segunda transcrição independente é comparada antes de aceitar. **Não haverá raspagem automática do site.**
-   - **USDA:** usa os CSVs oficiais (SR Legacy e Foundation). Nutrientes por número: energia 1008 (ou 2047/2048 nos Foundation), proteína 1003, lipídios 1004, carboidrato por diferença 1005, fibra 1079, sódio 1093, saturados 1258.
-3. **Normaliza.**
-   - Converte vírgula decimal.
-   - Mapeia símbolos (§3.3).
-   - Converte unidades para g, mg e kcal.
-   - Junta as tabelas da TACO.
-   - Preserva a string original para o relatório.
-4. **Classifica** o preparo, a categoria, o nome base e os sinônimos (§3.5), usando os arquivos de `curation/`.
-5. **Valida** (§3.7).
-6. **Emite** `food_library.json`:
-   - Ordenado por `sourceKey`.
-   - Números em notação decimal simples.
-   - Sem carimbo de tempo no conteúdo.
-   
-   Rodar duas vezes gera **bytes idênticos**. A verificação de CI regenera o asset e falha se `git diff` não estiver vazio. O `libraryVersion` (em `curation/library-version.txt`) aumenta sempre que o conteúdo muda.
-7. **Gera o relatório**: contagem por fonte, categoria e preparo; avisos; e o diff contra a versão anterior (alimentos adicionados, removidos e com valores alterados).
-
-### Formato do asset (estrutura; valores são marcadores, não dados)
-
-```json
-{
-  "formatVersion": 1,
-  "libraryVersion": 1,
-  "sources": [
-    { "code": "TACO4", "name": "Tabela Brasileira de Composição de Alimentos — TACO",
-      "edition": "4ª ed. rev. e ampl.", "publisher": "NEPA/UNICAMP", "year": 2011,
-      "license": "Reprodução permitida desde que citada a fonte",
-      "citation": "NEPA. TACO. 4. ed. ...", "carbohydrateBasis": "TOTAL_BY_DIFFERENCE" }
-  ],
-  "foods": [
-    {
-      "key": "TACO4:<nº do item>",
-      "source": "TACO4",
-      "sourceCode": "<nº do item>",
-      "sourceDescription": "<descrição exatamente como na tabela>",
-      "sourceGroup": "<grupo da tabela>",
-      "name": "<nome de exibição>",
-      "baseName": "<nome sem o preparo>",
-      "aliases": ["<sinônimo>"],
-      "category": "PROTEINS",
-      "preparation": "GRILLED",
-      "reference": { "amount": 100, "unit": "GRAM" },
-      "nutrients": {
-        "energyKcal":    { "value": "<valor>" },
-        "proteinG":      { "value": "<valor>" },
-        "carbohydrateG": { "status": "NOT_APPLICABLE" },
-        "fatG":          { "value": "<valor>" },
-        "saturatedFatG": { "value": "<valor>" },
-        "fiberG":        { "status": "NOT_APPLICABLE" },
-        "sodiumMg":      { "status": "TRACE" }
-      },
-      "portions": []
-    }
-  ]
-}
+```bash
+./gradlew :tools:food-importer:generateFoodLibrary
 ```
 
-`status` pode ser `MEASURED` (padrão quando há `value`), `TRACE`, `NOT_APPLICABLE` ou `NOT_AVAILABLE`.
-
-## 3.5 Classificação
-
-### Preparo (`Preparation`)
-
-| Enum | Exibição | Exemplos de termos no nome da fonte |
-|---|---|---|
-| `RAW` | Cru | cru, crua, in natura, fresco |
-| `COOKED` | Cozido | cozido, cozida, cozido com sal |
-| `GRILLED` | Grelhado | grelhado, grelhada |
-| `ROASTED` | Assado | assado, assada, ao forno |
-| `FRIED` | Frito | frito, frita |
-| `SAUTEED` | Refogado | refogado, refogada |
-| `TOASTED` | Torrado | torrado, torrada |
-| `CANNED` | Em conserva | conserva, em óleo, enlatado |
-| `DRIED` | Seco ou em pó | desidratado, em pó, seco |
-| `READY_TO_EAT` | Pronto para consumo | pães, laticínios, óleos, açúcar, bebidas (sem estado de preparo aplicável) |
-| `PREPARED_DISH` | Preparação culinária | receitas e pratos prontos |
-
-- A classificação é feita por termos e, quando ambígua, pelo arquivo `curation/preparation-overrides.csv`.
-- **A saída não pode conter preparo indefinido.** Item sem classificação interrompe a importação.
-- O **nome base** (descrição sem o termo de preparo, ex.: "Frango, peito, sem pele") permite agrupar variações na busca: um resultado "Peito de frango sem pele" com os botões **Cru · Cozido · Grelhado**. Cada botão aponta para um registro diferente. Assim a escolha do preparo é sempre explícita.
-
-### Categoria do app
-
-O grupo original da fonte é preservado em `sourceGroup` e pode ser usado como filtro. A categoria do app (os cinco grupos do requisito) vem de `curation/category-map.csv`, com exceções por item:
-
-| Grupo TACO (a confirmar na Fase 2) | Categoria padrão | Exceções previstas |
-|---|---|---|
-| Carnes e derivados; Pescados e frutos do mar; Ovos e derivados | Proteínas | — |
-| Leite e derivados | Proteínas (leite, iogurte e queijos estão em "Proteínas" no requisito) | Creme de leite e similares → Gorduras |
-| Cereais e derivados; Leguminosas e derivados | Carboidratos | Derivados de soja ricos em proteína → Proteínas |
-| Frutas e derivados | Carboidratos (como no requisito) | Abacate e coco → Gorduras |
-| Verduras, hortaliças e derivados | Vegetais e legumes | Batata, batata-doce, mandioca, inhame e cará → Carboidratos |
-| Gorduras e óleos; Nozes e sementes | Gorduras | — |
-| Bebidas; Produtos açucarados; Miscelâneas; Industrializados; Alimentos preparados | Outros | — |
-
-A categoria serve para organizar a lista. **Não é uma afirmação nutricional.** Os macronutrientes de cada alimento estão sempre visíveis.
-
-### Sinônimos (`aliases`)
-
-Termos regionais e populares, mantidos em `curation/aliases.csv`. Exemplos:
-- aipim e macaxeira → mandioca
-- castanha-do-pará → castanha-do-Brasil
-- carne magra → cortes magros
-- abobrinha → abobrinha italiana
-- frango grelhado → peito grelhado
-
-## 3.6 Importação no app (seed)
-
-`LibrarySeeder`, chamado na inicialização do app:
-
-```
-assetVersion = cabeçalho do asset (libraryVersion, sha256)
-installed    = app_meta['library.version'] ou 0
-se assetVersion > installed:
-    em UMA transação:
-        upsert de data_source por code
-        upsert de food_category de sistema por code
-        para cada alimento do asset:
-            se sourceKey existe → UPDATE só das colunas de origem (preserva id)
-            senão               → INSERT (origin = 'LIBRARY')
-        UPDATE food SET isDeprecated = 1
-            WHERE origin = 'LIBRARY' AND sourceKey NOT IN (chaves do asset)
-        substitui as porções da biblioteca (isUserDefined = 0) dos itens tocados
-        app_meta['library.version'] = assetVersion
+```bash
+./gradlew :tools:food-importer:verifyFoodLibrary
 ```
 
-O que isso garante:
-- **Sem duplicação:** a chave é `sourceKey` (UNIQUE), nunca o nome.
-- **Idempotência:** rodar duas vezes não muda nada (testado).
-- **Isolamento:** linhas `CUSTOM`, `food_usage` (favoritos), diário, planos e metas não são tocados.
-- **Histórico preservado:** se um valor mudar numa versão nova da biblioteca, os registros antigos continuam com o snapshot antigo. Só os próximos registros usam o valor novo.
-- **Atomicidade:** se o processo morrer no meio, a transação é desfeita e a importação recomeça na próxima abertura.
-- **Desempenho:** inserção em lote numa transação. O asset é lido em *streaming* com `kotlinx.serialization`.
+```bash
+./gradlew test
+```
 
-## 3.7 Validação e garantia de qualidade
+- `generateFoodLibrary` gera o asset e o relatório.
+- `verifyFoodLibrary` falha se o asset commitado for diferente do que seria gerado.
+- `./gradlew test` roda 41 testes, inclusive a integração com os arquivos reais.
 
-| Código | Regra | Severidade |
+### Valor publicado (TACO)
+
+A planilha oficial guarda médias **sem arredondamento** (ex.: 123,53489 kcal), e o PDF publica a tabela arredondada (124 kcal). O Calories usa o **valor publicado**:
+1. Arredonda a 12 algarismos significativos, para eliminar ruído de ponto flutuante da planilha (0,6499999999999999 → 0,65).
+2. Arredonda `HALF_UP` nas casas usadas pelo PDF:
+
+| Coluna | Casas |
+|---|---|
+| Energia | 0 |
+| Proteína, lipídios, carboidrato, fibra, saturada | 1 |
+| Sódio | 0 |
+
+Carboidratos por diferença levemente negativos aparecem nas análises de três carnes. A TACO os publica como 0,0, e o app os importa como 0,0 com uma observação.
+
+### Checagem cruzada entre os dois arquivos oficiais
+
+Cada valor usado pelo app, depois de arredondado, é comparado com o número impresso no PDF:
+- O texto do PDF é lido com PDFBox.
+- Cada número é atribuído à coluna cujo rótulo de unidade ("(kcal)", "(mg)"…) está mais próximo na horizontal.
+- Assim, células vazias não deslocam colunas.
+
+**Resultado da última execução:**
+
+| Campo | Valores comparados | Divergências |
 |---|---|---|
-| E1 | `sourceKey` duplicado | Erro |
-| E2 | Arquivo bruto com SHA-256 diferente do `sources.lock.json` | Erro |
-| E3 | Símbolo desconhecido ou número inválido | Erro |
-| E4 | Valor negativo; proteína, gordura ou carboidrato > 100 g/100 g; sódio > 40.000 mg/100 g | Erro |
-| E5 | Gordura saturada > gordura total (tolerância de 0,1 g) | Erro |
-| E6 | Preparo ou categoria não classificados | Erro |
-| E7 | Divergência com `golden-values.csv` | Erro |
-| E8 | TACO: kcal × 4,184 diverge do kJ publicado além do arredondamento (indica coluna trocada na extração) | Erro, salvo exceção registrada após conferência manual |
-| E9 | TACO: umidade + proteína + lipídios + carboidrato + cinzas ≠ 100 g além do arredondamento (o carboidrato é por diferença, então a soma fecha em 100) | Erro, salvo exceção registrada |
-| W1 | Energia diverge mais de 15% de 4·P + 4·C + 9·G (normal com álcool, fibra elevada ou fatores específicos) | Aviso. **O valor nunca é corrigido.** |
-| W2 | Fibra > carboidrato total | Aviso |
-| W3 | Nutriente opcional ausente | Aviso (contado no relatório) |
-| W4 | Nome normalizado parecido com o de outra fonte (possível duplicata) | Aviso |
+| Umidade, energia (kcal e kJ), proteína, lipídios, carboidrato, fibra, cinzas, sódio | 597 × 9 = 5.373 | 0 |
+| Gordura saturada (Tabela 2) | 423 | 0 |
+| **Total** | **5.796** | **0** |
 
-**Valores de ouro (`golden-values.csv`):** para cada alimento da lista inicial (§3.8) e para uma amostra aleatória de 5% dos demais, uma pessoa confere os valores diretamente na página do PDF oficial e registra fonte, página e valor. O teste do importador compara a saída com esse arquivo. Isso garante que extração, junção de tabelas e mapeamento de colunas estão corretos.
+Linhas não comparáveis: 0. As únicas diferenças entre os dois arquivos são de **descrição** e estão documentadas (§3.6).
 
-## 3.8 Cobertura da lista inicial do requisito
+### Valores de ouro
 
-> **Expectativa de cobertura, não verificada.** Baseia-se no conhecimento prévio da estrutura da TACO 4ª ed. e será confirmada item a item contra o arquivo oficial na Fase 2. As descrições abaixo indicam o que procurar. Não são nomes oficiais confirmados, e não há valores nesta tabela.
+Há 213 valores conferidos **por um caminho independente do importador**:
+- TACO: 17 alimentos prioritários, extraídos do PDF com `pdftotext` (Poppler), não com PDFBox.
+- USDA: os 14 itens, extraídos do dataset **JSON** oficial (o importador lê o CSV).
 
-Legenda:
-- ✅ esperado na TACO.
-- 🔶 a confirmar, possível lacuna na TACO: buscar na TBCA e depois no USDA.
-- 🔷 não é um item de tabela: tratado por sinônimos ou por escolha do usuário.
-- 🏷️ produto de marca: cadastro pelo rótulo é o mais preciso.
+O JSON do USDA publica 3 algarismos significativos (30,86 no CSV → 30,9 no JSON), por isso esses valores são comparados com tolerância de meia unidade nesse algarismo. Todos conferem.
 
-**Proteínas**
+### Regras de validação
 
-| Pedido | Preparos esperados | Status |
+| Código | Regra | Tipo |
 |---|---|---|
-| Peito de frango | com e sem pele; cru, cozido, grelhado | ✅ |
-| Coxa de frango | com e sem pele; crua, cozida, assada | ✅ |
-| Carne bovina magra | — | 🔷 sinônimo para cortes magros reais |
-| Patinho | cru, grelhado | ✅ |
-| Acém | cru, cozido, moído | ✅ |
-| Alcatra | cru, grelhado (a TACO deve listar como "miolo de alcatra") | ✅ confirmar o nome |
-| Carne moída | corte moído (ex.: acém moído), cru e cozido | 🔷 a composição depende do corte; o usuário escolhe |
-| Tilápia | crua, grelhada | 🔶 |
-| Salmão | cru, grelhado | ✅ |
-| Atum | fresco cru; em conserva | ✅ |
-| Sardinha | crua, assada, frita, em conserva | ✅ |
-| Ovo inteiro | cru, cozido, frito | ✅ |
-| Clara de ovo | cozida (crua a confirmar) | ✅ |
-| Leite | integral, desnatado (por 100 g) | ✅ |
-| Iogurte natural | integral, desnatado | ✅ |
-| Queijo cottage | — | 🔶 |
-| Whey protein | pó | 🔶🏷️ a composição varia muito entre concentrado, isolado e marcas: o rótulo é recomendado; o genérico do USDA fica identificado como tal |
+| E1 | Chave duplicada | Erro |
+| E2 | Arquivo bruto ausente ou com SHA-256 divergente | Erro |
+| E3 | Símbolo desconhecido ou valor negativo fora do carboidrato por diferença | Erro |
+| E4 | Macronutriente > 100 g/100 g; sódio > 40.000 mg/100 g | Erro |
+| E5 | Saturada > gordura total + 0,1 g | Erro |
+| E6 | Item sem preparo ou categoria definidos | Erro |
+| E7 | Valor de ouro divergente | Erro |
+| E8 | kcal × 4,184 diverge do kJ em mais de 5 kJ (indica coluna trocada) | Erro |
+| E9 | Umidade + proteína + lipídios + carboidrato + cinzas (+ álcool) fora de 100 ± 0,5 g, quando o carboidrato é calculado por diferença (> 0) | Erro |
+| E10 | Divergência planilha × PDF não documentada | Erro |
+| E11 | Curadoria apontando para chave inexistente, ou divergência documentada que não ocorre mais | Erro |
+| E12 | Conteúdo mudou sem incrementar `library-version.txt` | Erro |
+| E13 | Mesmo nome base e mesmo preparo em dois itens (escolha ambígua na busca) | Erro |
+| W1 | Energia diverge mais de 15% de 4P + 4C + 9G | Aviso (42) |
+| W2 | Fibra > carboidrato total | Aviso (7) |
+| W5 | Pequena inconsistência kcal/kJ dentro da própria TACO | Aviso (7) |
 
-**Carboidratos**
+Nas verificações de consistência da última execução:
+- E8 checou 591 itens, com desvio máximo de 1,8 kJ.
+- E9 checou 404 itens da TACO (desvio máximo de 0,11 g) e 12 do USDA (0,07 g).
 
-| Pedido | Preparos esperados | Status |
+## 3.5 Curadoria (`nutrition-data/curation/`)
+
+Decisões humanas ficam em CSVs revisáveis, sempre com justificativa:
+
+| Arquivo | Conteúdo |
+|---|---|
+| `categories.csv` | As 5 categorias do app |
+| `taco-groups.csv` | Grupo da TACO → categoria padrão e preparo padrão (quando o grupo permite) |
+| `category-overrides.csv` | 51 exceções. Exemplos: batata, mandioca e derivados → Carboidratos; abacate e amendoim → Gorduras; cuscuz e tapioca → Carboidratos, como no requisito. |
+| `preparation-overrides.csv` | 98 itens cuja descrição não traz palavra de preparo (pães, polpas congeladas, sucos, embutidos, "à milanesa"…). As decisões citam o protocolo do Apêndice 2 da TACO quando ele existe. |
+| `aliases.csv` | 80 sinônimos de busca (aipim, macaxeira, castanha-do-pará, carne magra…) |
+| `usda-foods.csv` | Os 14 itens do USDA, com nome em português e justificativa |
+| `source-corrections.csv` | Correções **de texto** (nunca de valores) |
+| `taco-pdf-deviations.csv` | Divergências conhecidas entre planilha e PDF |
+| `value-exclusions.csv` | Valores fisicamente impossíveis descartados (viram "sem dado"; nunca substituídos) |
+| `taco-alcohol.csv` | Teor alcoólico da nota †† da Tabela 1, usado só na verificação E9 |
+| `golden-values.csv` | Valores de ouro |
+| `requested-foods.csv` | Mapeamento da lista inicial do requisito → alimentos da biblioteca |
+| `library-version.txt` | Versão da biblioteca (o app reimporta quando ela aumenta) |
+
+### Problemas encontrados nas fontes
+
+| Item | Problema | Tratamento |
 |---|---|---|
-| Arroz branco | cru, cozido | ✅ |
-| Arroz integral | cru, cozido | ✅ |
-| Feijão carioca | cru, cozido | ✅ |
-| Feijão preto | cru, cozido | ✅ |
-| Batata inglesa | crua, cozida, frita | ✅ |
-| Batata-doce | crua, cozida | ✅ |
-| Mandioca | crua, cozida, frita | ✅ |
-| Macarrão | cru ✅; cozido 🔶 | ✅/🔶 |
-| Aveia | flocos | ✅ |
-| Pão francês | — | ✅ |
-| Pão integral | pão de forma integral | ✅ |
-| Tapioca | goma hidratada; tapioca preparada | 🔶 |
-| Cuscuz | cuscuz de milho cozido; cuscuz paulista | ✅ |
-| Banana | variedades (prata, nanica, maçã…), crua | ✅ |
-| Maçã | variedades, crua | ✅ |
-| Mamão | formosa, papaia | ✅ |
-| Laranja | variedades, crua | ✅ |
+| TACO 540 | A planilha traz a descrição "L"; o PDF traz "Feijoada" (valores iguais nos dois) | Descrição do PDF |
+| TACO 69 | O PDF grafa "Abobora" sem acento | Descrição da planilha ("Abóbora") |
+| TACO 472, 474 | O marcador de nota de rodapé faz parte da descrição ("Cerveja, pilsen 2") | Marcador removido |
+| TACO 368 (maminha grelhada) | 2,4 g de lipídios, mas os ácidos graxos publicados somam 17,6 g (saturada 9,7 g) | Saturada **descartada** (sem dado), com observação no app |
+| TACO 251, 252, 256, 292, 492, 559, 594 | kcal × 4,184 difere levemente do kJ publicado (até 1,8 kJ) | Aviso W5; o app usa as kcal publicadas |
+| TACO 78, 108, 128, 163, 241, 325, 586 | Fibra publicada maior que o carboidrato total (que deveria incluí-la); são duas medições independentes com margem analítica | Aviso W2; os dois valores são mantidos como publicados |
 
-**Gorduras**
+## 3.6 Classificação
 
-| Pedido | Preparos esperados | Status |
-|---|---|---|
-| Azeite de oliva | extravirgem | ✅ |
-| Pasta de amendoim | — | 🔶🏷️ |
-| Amendoim | cru, torrado | ✅ |
-| Castanha-do-pará | crua (na TACO deve aparecer como "castanha-do-Brasil") | ✅ via sinônimo |
-| Castanha-de-caju | torrada | ✅ |
-| Abacate | cru | ✅ |
-| Manteiga | com sal, sem sal | ✅ |
-| Óleo de soja | — | ✅ |
+**Preparo:** detectado pela última palavra de preparo na descrição (cru, cozido, grelhado, assado, frito, refogado, torrado, conserva, desidratado/pó), ou definido na curadoria. Distribuição:
 
-**Vegetais e legumes**
+| Preparo | Itens |
+|---|---|
+| Cru | 254 |
+| Pronto para consumo | 134 |
+| Cozido | 63 |
+| Preparação culinária | 37 |
+| Frito | 28 |
+| Seco ou em pó | 22 |
+| Assado | 22 |
+| Grelhado | 22 |
+| Em conserva | 14 |
+| Refogado | 9 |
+| Torrado | 6 |
 
-| Pedido | Preparos esperados | Status |
-|---|---|---|
-| Alface | variedades, crua | ✅ |
-| Tomate | cru; derivados (extrato, molho) | ✅ |
-| Cenoura | crua, cozida | ✅ |
-| Brócolis | cru, cozido | ✅ |
-| Couve | crua, refogada | ✅ |
-| Abobrinha | crua, cozida, refogada | ✅ |
-| Pepino | cru | ✅ |
-| Beterraba | crua, cozida | ✅ |
-| Espinafre | cru, refogado | ✅ |
-| Repolho | branco e roxo; cru, refogado | ✅ |
+Farinhas, féculas e polvilho são classificados como "Cru", seguindo a própria TACO ("Farinha, de mandioca, crua", "Milho, fubá, cru").
 
-**Outros**
+**Nome base:** é a descrição sem o segmento final de preparo. Por exemplo, "Frango, peito, sem pele, grelhado" vira "Frango, peito, sem pele". Ele agrupa as variações de um mesmo alimento (100 grupos), e o usuário escolhe explicitamente **Cru · Cozido · Grelhado**. A regra E13 garante que nenhum grupo tenha dois itens com o mesmo preparo.
 
-| Pedido | Preparos esperados | Status |
-|---|---|---|
-| Café | infusão; pó | ✅ |
-| Açúcar | refinado, cristal, mascavo | ✅ |
-| Mel | — | ✅ |
-| Chocolate amargo | a TACO deve ter "meio amargo", que **não** é o mesmo que amargo 70%. Os dois não serão confundidos. | ✅ meio amargo / 🔶 amargo |
-| Iogurte proteico | — | 🏷️ sem equivalente genérico em tabela |
-| Granola | — | 🔶🏷️ a composição varia muito por marca |
-| Suco de laranja | suco natural (por 100 g) | ✅ |
-| Água de coco | — | 🔶 |
+**Categoria:** é organização da lista, não afirmação nutricional. O grupo original da TACO fica preservado em `sourceGroup`.
 
-**Volume esperado na v1:** a TACO completa (597 itens, segundo a descrição da 4ª edição; contagem a confirmar no arquivo), mais algumas dezenas de itens de lacuna da TBCA e do USDA. É o suficiente para o app nunca abrir vazio. A estrutura (asset versionado, `sourceKey`, *upsert*) comporta dezenas de milhares de itens sem mudar o esquema.
+| Categoria | Itens |
+|---|---|
+| Proteínas | 209 |
+| Carboidratos | 214 |
+| Gorduras | 35 |
+| Vegetais e legumes | 74 |
+| Outros | 79 |
 
-## 3.9 Medidas caseiras e densidades (opcional)
+## 3.7 Cobertura da lista inicial
 
-- **Medidas caseiras** ("1 colher de sopa", "1 unidade média") só entram com fonte documentada. A candidata é a tabela de medidas referidas da POF/IBGE. Licença e conteúdo serão verificados antes de usar. Sem fonte, o alimento aceita apenas g (ou ml).
-- **Densidade (g/ml)** para registrar líquidos em ml: só com dado documentado, como a massa de uma medida de volume publicada no USDA FDC, com a origem guardada em `densitySource`. Sem densidade, o leite da TACO é registrado em gramas, e a interface explica o motivo.
-- O usuário pode criar suas próprias porções ("minha concha = 140 g") a qualquer momento.
+Todos os 60 itens do requisito estão mapeados. A tabela completa, com as chaves, está no relatório de importação.
 
-## 3.10 Pré-requisitos para iniciar a Fase 2
+| Situação | Itens |
+|---|---|
+| ✅ Na TACO | Peito e coxa de frango, patinho, acém, alcatra (miolo), salmão, atum, sardinha, ovo, clara, leite, iogurte natural, arroz branco e integral, feijão carioca e preto, batata, batata-doce, mandioca, aveia, pão francês, pão integral, cuscuz, banana, maçã, mamão, laranja, azeite, amendoim, castanha-do-pará, castanha-de-caju, abacate, manteiga, óleo de soja, os 10 vegetais, café, açúcar, mel, suco de laranja, água de coco |
+| 🔷 Sem item único | "Carne bovina magra" (sinônimo para 10 cortes magros) e "carne moída" (acém moído; a composição depende do corte) |
+| 🌎 Lacuna na TACO, coberta pelo USDA | Tilápia (crua e cozida), queijo cottage, macarrão cozido, pasta de amendoim, whey protein (genérico), chocolate amargo 60–85% (a TACO tem "meio amargo", que continua disponível) |
+| 🏷️ Melhor pelo rótulo | Iogurte proteico (há iogurte grego do USDA como referência, não como equivalente), granola (receita caseira do USDA como referência), goma de tapioca (a TACO tem "Tapioca, com manteiga") |
 
-1. **Acesso aos arquivos oficiais.** Este ambiente bloqueia `nepa.unicamp.br`, `tbca.net.br` e `fdc.nal.usda.gov`. Há duas saídas:
-   - (a) liberar esses domínios na configuração de rede do ambiente; ou
-   - (b) baixar os arquivos e colocá-los em `nutrition-data/raw/` (ver [nutrition-data/README.md](../nutrition-data/README.md)).
-2. **Confirmar os termos de uso da TBCA** (§3.2), no site ou pelo contato oficial, antes de incluir qualquer item TBCA.
-3. **Confirmar o texto de permissão e a metodologia da TACO** (símbolos, base do carboidrato, tabela de ácidos graxos) no PDF oficial.
+## 3.8 Importação no app (Fase 3)
+
+O asset `food_library.json` segue o formato definido em `:library-format` (`LibraryAsset`), compartilhado entre o importador e o app. O `LibrarySeeder` da Fase 3 vai:
+- importar por `key` (`TACO4:<nº>` ou `USDA_SR:<fdcId>`) numa única transação;
+- marcar como `isDeprecated` os itens que saírem da biblioteca;
+- nunca tocar em alimentos personalizados, favoritos, diário ou planos;
+- gravar `library.version` na mesma transação.
+
+Detalhes em [02-banco-de-dados.md](02-banco-de-dados.md).
+
+## 3.9 Como atualizar a biblioteca
+
+1. Para uma nova versão de um arquivo oficial:
+   1. Coloque o arquivo em `nutrition-data/raw/…`.
+   2. Atualize URL, data e SHA-256 em `sources.lock.json`.
+2. Ajuste a curadoria, se necessário, e incremente `curation/library-version.txt`.
+3. Gere o asset e o relatório com `./gradlew :tools:food-importer:generateFoodLibrary`.
+4. Revise o relatório: a seção "Diferenças em relação ao asset anterior" lista o que entrou, saiu ou mudou.
+5. Rode `./gradlew test` e faça o commit do asset junto com o relatório.
