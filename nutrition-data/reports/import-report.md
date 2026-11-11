@@ -4,10 +4,10 @@
 
 | Item | Valor |
 |---|---|
-| Versão da biblioteca | 1 |
+| Versão da biblioteca | 2 |
 | Formato do asset | 1 |
-| Alimentos | 611 |
-| SHA-256 do asset | `6ccb2fba0a878a3b923a26dbfb147457a453605d3e28e9eab897b828539cfdd2` |
+| Alimentos | 614 |
+| SHA-256 do asset | `615fe94fa034718d29b77a785efe9706895bd0eff4f593a9569cda242f8e51f0` |
 | Erros | 0 |
 | Avisos | 56 |
 
@@ -27,11 +27,11 @@
 | Fonte | Alimentos |
 |---|---|
 | TACO4 | 597 |
-| USDA_SR | 14 |
+| USDA_SR | 17 |
 
 | Categoria | Alimentos |
 |---|---|
-| Proteínas | 209 |
+| Proteínas | 212 |
 | Carboidratos | 214 |
 | Gorduras | 35 |
 | Vegetais e legumes | 74 |
@@ -48,20 +48,20 @@
 | Torrado | 6 | description: 6 |
 | Em conserva | 14 | description: 14 |
 | Seco ou em pó | 22 | curated_selection: 2, description: 11, override: 9 |
-| Pronto para consumo | 134 | curated_selection: 7, group_default: 72, override: 55 |
+| Pronto para consumo | 137 | curated_selection: 10, group_default: 72, override: 55 |
 | Preparação culinária | 37 | group_default: 30, override: 7 |
 
 ## Status dos nutrientes
 
 | Nutriente | Medido | Traço (Tr) | Não aplicável (NA) | Sem dado |
 |---|---|---|---|---|
-| Energia | 605 | 0 | 2 | 4 |
-| Proteínas | 590 | 6 | 10 | 5 |
-| Carboidratos | 596 | 0 | 10 | 5 |
-| Gorduras totais | 574 | 30 | 2 | 5 |
-| Gorduras saturadas | 430 | 36 | 2 | 143 |
-| Fibras | 369 | 7 | 221 | 14 |
-| Sódio | 537 | 64 | 0 | 10 |
+| Energia | 608 | 0 | 2 | 4 |
+| Proteínas | 593 | 6 | 10 | 5 |
+| Carboidratos | 599 | 0 | 10 | 5 |
+| Gorduras totais | 577 | 30 | 2 | 5 |
+| Gorduras saturadas | 433 | 36 | 2 | 143 |
+| Fibras | 372 | 7 | 221 | 14 |
+| Sódio | 540 | 64 | 0 | 10 |
 
 ## Checagem cruzada TACO: planilha × PDF oficial
 
@@ -100,8 +100,8 @@ Divergências de valor: **0**. Divergências de descrição: **2** (todas precis
 |---|---|---|
 | E8 kcal↔kJ (TACO) | 591 | 1.7758290666667 |
 | E9 soma centesimal (TACO4) | 404 | 0.10579710144927094 |
-| E9 soma centesimal (USDA_SR) | 12 | 0.07 |
-| E7 valores de ouro | 213 | — |
+| E9 soma centesimal (USDA_SR) | 15 | 0.07 |
+| E7 valores de ouro | 234 | — |
 
 ## Cobertura da lista inicial do requisito
 
@@ -120,7 +120,7 @@ Divergências de valor: **0**. Divergências de descrição: **2** (todas precis
 | Sardinha | Proteínas | ✅ TACO | `TACO4:318` Sardinha, assada<br>`TACO4:319` Sardinha, conserva em óleo<br>`TACO4:320` Sardinha, frita<br>`TACO4:321` Sardinha, inteira, crua |  |
 | Ovo inteiro | Proteínas | ✅ TACO | `TACO4:488` Ovo, de galinha, inteiro, cozido/10minutos<br>`TACO4:489` Ovo, de galinha, inteiro, cru<br>`TACO4:490` Ovo, de galinha, inteiro, frito | Cru, cozido e frito. |
 | Clara de ovo | Proteínas | ✅ TACO | `TACO4:486` Ovo, de galinha, clara, cozida/10minutos | A TACO traz só a clara cozida. |
-| Leite | Proteínas | ✅ TACO | `TACO4:458` Leite, de vaca, integral<br>`TACO4:457` Leite, de vaca, desnatado, UHT<br>`TACO4:459` Leite, de vaca, integral, pó<br>`TACO4:456` Leite, de vaca, desnatado, pó | Valores por 100 g (a TACO não usa ml). |
+| Leite | Proteínas | 🌎 USDA (lacuna na TACO) | `USDA_SR:172217` Leite de vaca integral, fluido (3,25% de gordura)<br>`USDA_SR:172205` Leite de vaca semidesnatado, fluido (2% de gordura)<br>`USDA_SR:173432` Leite de vaca desnatado, fluido<br>`TACO4:458` Leite, de vaca, integral<br>`TACO4:457` Leite, de vaca, desnatado, UHT<br>`TACO4:459` Leite, de vaca, integral, pó<br>`TACO4:456` Leite, de vaca, desnatado, pó | Na TACO 4ª ed., energia e macronutrientes do leite fluido estão em reavaliação (*); leite fluido completo vem do USDA. Leite em pó: TACO. |
 | Iogurte natural | Proteínas | ✅ TACO | `TACO4:448` Iogurte, natural<br>`TACO4:449` Iogurte, natural, desnatado |  |
 | Queijo cottage | Proteínas | 🌎 USDA (lacuna na TACO) | `USDA_SR:172179` Queijo cottage, tradicional<br>`USDA_SR:172182` Queijo cottage, light (2% de gordura) | Ausente na TACO 4ª ed. |
 | Whey protein | Proteínas | 🌎 USDA (lacuna na TACO) | `USDA_SR:173177` Whey protein isolado (pó)<br>`USDA_SR:173180` Proteína em pó à base de soro de leite (whey) | Genérico; a composição varia muito por marca: prefira o rótulo. |
@@ -249,4 +249,10 @@ Avisos não bloqueiam e **não alteram valores**: os dados são mantidos como pu
 
 ## Diferenças em relação ao asset anterior
 
-Primeira geração (não havia asset anterior).
+Versão anterior: 1. Adicionados: 3. Removidos: 0. Alterados: 2.
+
+- + USDA_SR:172205 Leite de vaca semidesnatado, fluido (2% de gordura)
+- + USDA_SR:172217 Leite de vaca integral, fluido (3,25% de gordura)
+- + USDA_SR:173432 Leite de vaca desnatado, fluido
+- ~ TACO4:457 Leite, de vaca, desnatado, UHT: sinônimos
+- ~ TACO4:458 Leite, de vaca, integral: sinônimos

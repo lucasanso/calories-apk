@@ -31,10 +31,10 @@ class LibrarySeederTest {
     @After fun close() = db.close()
 
     @Test
-    fun `importa a biblioteca real com 611 alimentos, refeicoes iniciais e fonte do usuario`() = runBlocking<Unit> {
+    fun `importa a biblioteca real com 614 alimentos, refeicoes iniciais e fonte do usuario`() = runBlocking<Unit> {
         val status = TestDb.realSeeder(db).ensureLibrary()
-        assertEquals(1, status.installedVersion)
-        assertEquals(611, status.foodCount)
+        assertEquals(2, status.installedVersion)
+        assertEquals(614, status.foodCount)
         assertEquals(listOf("Café da manhã", "Almoço", "Lanche da tarde", "Jantar", "Ceia"), MealSlotRepositoryImpl(db).observeSlots().first().map { it.name })
         assertEquals(setOf("TACO4", "USDA_SR", "USER"), foods.observeSources().first().map { it.code }.toSet())
         assertEquals(5, foods.observeCategories().first().size)
@@ -53,7 +53,7 @@ class LibrarySeederTest {
         val before = foods.search("", FoodFilter.ALL, null).first().associate { it.sourceKey to it.id }
         val status = seeder.ensureLibrary()
         TestDb.realSeeder(db).ensureLibrary()
-        assertEquals(611, status.foodCount)
+        assertEquals(614, status.foodCount)
         assertEquals(before, foods.search("", FoodFilter.ALL, null).first().associate { it.sourceKey to it.id })
         assertEquals(5, MealSlotRepositoryImpl(db).observeSlots().first().size)
     }

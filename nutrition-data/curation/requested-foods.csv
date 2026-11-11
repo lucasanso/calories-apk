@@ -13,7 +13,7 @@ Atum,PROTEINS,TACO4:277;TACO4:278,OK,Fresco cru e em conserva.
 Sardinha,PROTEINS,TACO4:318;TACO4:319;TACO4:320;TACO4:321,OK,
 Ovo inteiro,PROTEINS,TACO4:488;TACO4:489;TACO4:490,OK,"Cru, cozido e frito."
 Clara de ovo,PROTEINS,TACO4:486,OK,A TACO traz só a clara cozida.
-Leite,PROTEINS,TACO4:458;TACO4:457;TACO4:459;TACO4:456,OK,Valores por 100 g (a TACO não usa ml).
+Leite,PROTEINS,USDA_SR:172217;USDA_SR:172205;USDA_SR:173432;TACO4:458;TACO4:457;TACO4:459;TACO4:456,USDA,"Na TACO 4ª ed., energia e macronutrientes do leite fluido estão em reavaliação (*); leite fluido completo vem do USDA. Leite em pó: TACO."
 Iogurte natural,PROTEINS,TACO4:448;TACO4:449,OK,
 Queijo cottage,PROTEINS,USDA_SR:172179;USDA_SR:172182,USDA,Ausente na TACO 4ª ed.
 Whey protein,PROTEINS,USDA_SR:173177;USDA_SR:173180,USDA,Genérico; a composição varia muito por marca: prefira o rótulo.

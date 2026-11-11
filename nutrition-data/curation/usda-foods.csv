@@ -16,3 +16,6 @@ fdc_id,name,base_name,category,preparation,note
 170273,"Chocolate amargo, 70–85% de cacau",,OTHERS,READY_TO_EAT,
 170272,"Chocolate amargo, 60–69% de cacau",,OTHERS,READY_TO_EAT,
 170894,"Iogurte grego, natural, desnatado",Iogurte grego,PROTEINS,READY_TO_EAT,"Iogurte grego não é o mesmo que ""iogurte proteico"" de marca; para esse, use o rótulo."
+172217,"Leite de vaca integral, fluido (3,25% de gordura)",Leite de vaca integral,PROTEINS,READY_TO_EAT,A TACO 4ª ed. marca energia e macronutrientes do leite fluido com * (análises em reavaliação); estes valores são do USDA (leite sem vitaminas adicionadas).
+172205,"Leite de vaca semidesnatado, fluido (2% de gordura)",Leite de vaca semidesnatado,PROTEINS,READY_TO_EAT,A TACO 4ª ed. marca energia e macronutrientes do leite fluido com * (análises em reavaliação); estes valores são do USDA (leite sem vitaminas adicionadas).
+173432,"Leite de vaca desnatado, fluido",Leite de vaca desnatado,PROTEINS,READY_TO_EAT,A TACO 4ª ed. marca energia e macronutrientes do leite fluido com * (análises em reavaliação); estes valores são do USDA (leite sem vitaminas adicionadas).

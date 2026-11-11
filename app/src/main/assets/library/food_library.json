@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "libraryVersion": 1,
+  "libraryVersion": 2,
   "sources": [
     {
       "code": "TACO4",
@@ -17987,9 +17987,6 @@
       "sourceGroup": "Leite e derivados",
       "name": "Leite, de vaca, desnatado, UHT",
       "baseName": "Leite, de vaca, desnatado, UHT",
-      "aliases": [
-        "leite"
-      ],
       "category": "PROTEINS",
       "preparation": "READY_TO_EAT",
       "reference": {
@@ -18032,9 +18029,6 @@
       "sourceGroup": "Leite e derivados",
       "name": "Leite, de vaca, integral",
       "baseName": "Leite, de vaca, integral",
-      "aliases": [
-        "leite"
-      ],
       "category": "PROTEINS",
       "preparation": "READY_TO_EAT",
       "reference": {
@@ -23817,6 +23811,96 @@
       ]
     },
     {
+      "key": "USDA_SR:172205",
+      "source": "USDA_SR",
+      "sourceCode": "172205",
+      "sourceDescription": "Milk, reduced fat, fluid, 2% milkfat, without added vitamin A and vitamin D",
+      "sourceGroup": "Dairy and Egg Products",
+      "name": "Leite de vaca semidesnatado, fluido (2% de gordura)",
+      "baseName": "Leite de vaca semidesnatado",
+      "aliases": [
+        "leite semidesnatado"
+      ],
+      "category": "PROTEINS",
+      "preparation": "READY_TO_EAT",
+      "reference": {
+        "amount": 100.0,
+        "unit": "GRAM"
+      },
+      "nutrients": {
+        "energyKcal": {
+          "value": 50.0
+        },
+        "proteinG": {
+          "value": 3.3
+        },
+        "carbohydrateG": {
+          "value": 4.8
+        },
+        "fatG": {
+          "value": 1.98
+        },
+        "saturatedFatG": {
+          "value": 1.257
+        },
+        "fiberG": {
+          "value": 0.0
+        },
+        "sodiumMg": {
+          "value": 47.0
+        }
+      },
+      "notes": [
+        "A TACO 4ª ed. marca energia e macronutrientes do leite fluido com * (análises em reavaliação); estes valores são do USDA (leite sem vitaminas adicionadas).",
+        "Referência internacional (USDA, EUA): a composição pode diferir de produtos vendidos no Brasil. Para produtos de marca, prefira cadastrar os valores do rótulo."
+      ]
+    },
+    {
+      "key": "USDA_SR:172217",
+      "source": "USDA_SR",
+      "sourceCode": "172217",
+      "sourceDescription": "Milk, whole, 3.25% milkfat, without added vitamin A and vitamin D",
+      "sourceGroup": "Dairy and Egg Products",
+      "name": "Leite de vaca integral, fluido (3,25% de gordura)",
+      "baseName": "Leite de vaca integral",
+      "aliases": [
+        "leite integral"
+      ],
+      "category": "PROTEINS",
+      "preparation": "READY_TO_EAT",
+      "reference": {
+        "amount": 100.0,
+        "unit": "GRAM"
+      },
+      "nutrients": {
+        "energyKcal": {
+          "value": 61.0
+        },
+        "proteinG": {
+          "value": 3.15
+        },
+        "carbohydrateG": {
+          "value": 4.78
+        },
+        "fatG": {
+          "value": 3.27
+        },
+        "saturatedFatG": {
+          "value": 1.865
+        },
+        "fiberG": {
+          "value": 0.0
+        },
+        "sodiumMg": {
+          "value": 43.0
+        }
+      },
+      "notes": [
+        "A TACO 4ª ed. marca energia e macronutrientes do leite fluido com * (análises em reavaliação); estes valores são do USDA (leite sem vitaminas adicionadas).",
+        "Referência internacional (USDA, EUA): a composição pode diferir de produtos vendidos no Brasil. Para produtos de marca, prefira cadastrar os valores do rótulo."
+      ]
+    },
+    {
       "key": "USDA_SR:172470",
       "source": "USDA_SR",
       "sourceCode": "172470",
@@ -23938,6 +24022,51 @@
       },
       "notes": [
         "Valor genérico; a composição varia entre marcas: prefira o rótulo.",
+        "Referência internacional (USDA, EUA): a composição pode diferir de produtos vendidos no Brasil. Para produtos de marca, prefira cadastrar os valores do rótulo."
+      ]
+    },
+    {
+      "key": "USDA_SR:173432",
+      "source": "USDA_SR",
+      "sourceCode": "173432",
+      "sourceDescription": "Milk, nonfat, fluid, without added vitamin A and vitamin D (fat free or skim)",
+      "sourceGroup": "Dairy and Egg Products",
+      "name": "Leite de vaca desnatado, fluido",
+      "baseName": "Leite de vaca desnatado",
+      "aliases": [
+        "leite desnatado"
+      ],
+      "category": "PROTEINS",
+      "preparation": "READY_TO_EAT",
+      "reference": {
+        "amount": 100.0,
+        "unit": "GRAM"
+      },
+      "nutrients": {
+        "energyKcal": {
+          "value": 35.0
+        },
+        "proteinG": {
+          "value": 3.37
+        },
+        "carbohydrateG": {
+          "value": 4.86
+        },
+        "fatG": {
+          "value": 0.18
+        },
+        "saturatedFatG": {
+          "value": 0.117
+        },
+        "fiberG": {
+          "value": 0.0
+        },
+        "sodiumMg": {
+          "value": 42.0
+        }
+      },
+      "notes": [
+        "A TACO 4ª ed. marca energia e macronutrientes do leite fluido com * (análises em reavaliação); estes valores são do USDA (leite sem vitaminas adicionadas).",
         "Referência internacional (USDA, EUA): a composição pode diferir de produtos vendidos no Brasil. Para produtos de marca, prefira cadastrar os valores do rótulo."
       ]
     },

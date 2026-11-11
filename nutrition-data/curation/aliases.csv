@@ -68,8 +68,6 @@ TACO4:486,clara de ovo
 TACO4:272,óleo de soja
 TACO4:260,azeite de oliva
 TACO4:260,azeite
-TACO4:458,leite
-TACO4:457,leite
 TACO4:533,cuscuz
 TACO4:534,cuscuz
 TACO4:209,suco de laranja
@@ -80,3 +78,6 @@ TACO4:217,suco de laranja
 TACO4:478,água de coco
 TACO4:498,chocolate meio amargo
 TACO4:551,tapioca
+USDA_SR:172217,leite integral
+USDA_SR:172205,leite semidesnatado
+USDA_SR:173432,leite desnatado

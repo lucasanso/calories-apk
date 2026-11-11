@@ -59,7 +59,7 @@ class ImportPipelineIntegrationTest {
     fun `TACO completa e lacunas do USDA, sem duplicatas`() {
         val bySource = output.asset.foods.groupingBy { it.source }.eachCount()
         assertEquals(597, bySource["TACO4"])
-        assertEquals(14, bySource["USDA_SR"])
+        assertEquals(17, bySource["USDA_SR"])
         assertEquals(output.asset.foods.size, output.asset.foods.map { it.key }.toSet().size)
     }
 
