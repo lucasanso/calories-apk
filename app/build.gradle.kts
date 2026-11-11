@@ -33,6 +33,10 @@ android {
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true
+        unitTests.all {
+            // Robolectric baixa o runtime Android do espelho do Google (o Maven Central limita requisições).
+            it.systemProperty("robolectric.dependency.repo.url", "https://maven-central.storage-download.googleapis.com/maven2")
+        }
     }
 }
 
