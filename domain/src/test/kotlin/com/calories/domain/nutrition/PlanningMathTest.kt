@@ -2,6 +2,7 @@ package com.calories.domain.nutrition
 
 import com.calories.domain.model.DailyTotals
 import com.calories.domain.model.GoalOrigin
+import com.calories.domain.model.MealSlot
 import com.calories.domain.model.NutritionGoal
 import com.calories.domain.model.PlannedItem
 import java.time.DayOfWeek
@@ -84,5 +85,43 @@ class PlanningMathTest {
         assertTrue(WeightRules.validate(80.0, d.plusDays(1), d).isNotEmpty())
         assertEquals(listOf(80.0, 79.0, 78.0), WeightRules.movingAverage(listOf(80.0, 78.0, 76.0), window = 7))
         assertEquals(listOf(80.0, 79.0, 77.0), WeightRules.movingAverage(listOf(80.0, 78.0, 76.0), window = 2))
+    }
+
+    @Test
+    fun `serie do periodo tem todos os dias e a meta vigente em cada um`() {
+        val week = Periods.week(d) // 9 a 15/11
+        val goals = listOf(
+            NutritionGoal(LocalDate.of(2026, 1, 1), 2000.0, 120.0, null, null, null, GoalOrigin.MANUAL),
+            NutritionGoal(LocalDate.of(2026, 11, 12), 1800.0, 140.0, null, null, null, GoalOrigin.MANUAL),
+        )
+        fun day(date: LocalDate, kcal: Double, count: Int = 1) =
+            DailyTotals(date, count, NutrientAggregator.sum(List(count) { mapOf(Nutrient.ENERGY to NutrientValue.Measured(kcal / count)) }), null)
+        val series = PeriodSeries.build(week, listOf(day(d, 1900.0), day(d.plusDays(2), 1700.0, 2), day(d.plusDays(3), 0.0, 0)), goals)
+        assertEquals(7, series.size)
+        assertEquals(LocalDate.of(2026, 11, 9), series.first().date)
+        assertEquals(listOf(null, null, 1900.0, null, 1700.0, null, null), series.map { it.totals?.totals?.energyKcal })
+        assertEquals(listOf(2000.0, 2000.0, 2000.0, 1800.0, 1800.0, 1800.0, 1800.0), series.map { it.goal?.energyKcal })
+        // Média das metas só nos dias com registro: (2000 + 1800) / 2.
+        assertEquals(1900.0, PeriodSeries.averageGoal(series) { it.energyKcal })
+        assertEquals(130.0, PeriodSeries.averageGoal(series) { it.proteinG })
+        assertEquals(null, PeriodSeries.averageGoal(series) { it.fatG })
+    }
+
+    @Test
+    fun `agrupamento por refeicao mostra ativas vazias e inativas so com itens`() {
+        val slots = listOf(
+            MealSlot(2, "Almoço", 720, 1, true), MealSlot(1, "Café da manhã", 420, 0, true),
+            MealSlot(3, "Ceia", 1320, 2, false), MealSlot(4, "Lanche", 960, 3, false),
+        )
+        val items = listOf(
+            item(10, "Arroz", Preparation.COOKED, 150.0).copy(slotId = 2, consumed = mapOf(Nutrient.ENERGY to NutrientValue.Measured(192.0))),
+            item(11, "Feijão", Preparation.COOKED, 100.0).copy(slotId = 2, consumed = mapOf(Nutrient.ENERGY to NutrientValue.Measured(76.0))),
+            item(12, "Iogurte", Preparation.RAW, 170.0).copy(slotId = 3, consumed = mapOf(Nutrient.ENERGY to NutrientValue.NotAvailable)),
+        )
+        val groups = SlotGrouping.group(slots, items, { it.slotId }, { it.consumed })
+        assertEquals(listOf("Café da manhã", "Almoço", "Ceia"), groups.map { it.slot.name })
+        assertEquals(0, groups[0].items.size)
+        assertEquals(268.0, groups[1].totals.energyKcal)
+        assertTrue(!groups[2].totals[Nutrient.ENERGY].hasAnyData)
     }
 }

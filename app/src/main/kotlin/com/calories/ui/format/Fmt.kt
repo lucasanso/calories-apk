@@ -9,8 +9,11 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.util.Locale
 
 /**
@@ -82,6 +85,33 @@ object Fmt {
     }
 
     fun fullDate(date: LocalDate): String = fullDate.format(date)
+
+    private val shortDate = DateTimeFormatter.ofPattern("dd/MM/yyyy", locale)
+    private val monthYear = DateTimeFormatter.ofPattern("MMMM 'de' yyyy", locale)
+
+    /** "11/11/2026". */
+    fun shortDate(date: LocalDate): String = shortDate.format(date)
+
+    /** "11/11". */
+    fun dayMonth(date: LocalDate): String = "%02d/%02d".format(date.dayOfMonth, date.monthValue)
+
+    /** "Novembro de 2026". */
+    fun monthYear(month: YearMonth): String = monthYear.format(month.atDay(1)).replaceFirstChar { it.titlecase(locale) }
+
+    /** "seg", "ter"… */
+    fun weekdayShort(day: DayOfWeek): String = day.getDisplayName(TextStyle.SHORT, locale).removeSuffix(".").lowercase(locale)
+
+    /** "9 a 15 de nov." ou "28 de out. a 3 de nov."; o ano aparece quando não é o de [today]. */
+    fun period(from: LocalDate, to: LocalDate, today: LocalDate): String {
+        fun month(d: LocalDate) = d.month.getDisplayName(TextStyle.SHORT, locale).lowercase(locale).let { if (it.endsWith(".")) it else "$it." }
+        val year = if (to.year != today.year || from.year != today.year) " de ${to.year}" else ""
+        return if (from.month == to.month && from.year == to.year) "${from.dayOfMonth} a ${to.dayOfMonth} de ${month(to)}$year"
+        else "${from.dayOfMonth} de ${month(from)} a ${to.dayOfMonth} de ${month(to)}$year"
+    }
+
+    /** Quantidade de lista de compras ("400 g", "1,5 kg"); sem quantidade, vazio. */
+    fun quantity(quantity: Double?, unit: String?): String =
+        quantity?.let { listOfNotNull(number(it, 1, trimZeros = true), unit).joinToString(" ") } ?: ""
 
     fun time(minutes: Int?): String = minutes?.let { "%02d:%02d".format(it / 60, it % 60) } ?: ""
 

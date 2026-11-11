@@ -141,6 +141,7 @@ fun FoodDetailRoute(
                 is UiEvent.Message -> launch { snackbar.showSnackbar(e.text) }
                 is UiEvent.OpenFood -> onOpenCopy(e.foodId)
                 UiEvent.Close -> onBack()
+                else -> Unit
             }
         }
     }

@@ -7,6 +7,10 @@ import java.time.LocalDate
 
 enum class GoalOrigin { MANUAL, ESTIMATED }
 
+/** Meta vigente em [date] numa lista de metas (a de maior `effectiveFrom` ≤ data). */
+fun List<NutritionGoal>.goalOn(date: LocalDate): NutritionGoal? =
+    filter { !it.effectiveFrom.isAfter(date) }.maxByOrNull { it.effectiveFrom }
+
 /** Meta diária vigente a partir de [effectiveFrom] (inclusive) até a próxima meta. */
 data class NutritionGoal(
     val effectiveFrom: LocalDate,

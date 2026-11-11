@@ -1,8 +1,12 @@
 package com.calories.domain.nutrition
 
 import com.calories.domain.model.DailyTotals
+import com.calories.domain.model.MealSlot
 import com.calories.domain.model.NewShoppingItem
+import com.calories.domain.model.NutritionGoal
 import com.calories.domain.model.PlannedItem
+import com.calories.domain.model.SlotGroup
+import com.calories.domain.model.goalOn
 import java.text.Collator
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -59,6 +63,31 @@ data class PeriodStats(
             val within = withGoal.count { d -> abs(d.totals.energyKcal - d.goal!!.energyKcal) <= d.goal.energyKcal * GOAL_TOLERANCE }
             return PeriodStats(from, to, inRange.size, averages, within, withGoal.size)
         }
+    }
+}
+
+/** Um dia de um período do histórico, com ou sem registro, e a meta vigente nele. */
+data class PeriodDay(val date: LocalDate, val totals: DailyTotals?, val goal: NutritionGoal?)
+
+object PeriodSeries {
+    /** Todos os dias do intervalo, em ordem (dias sem registro ficam com [PeriodDay.totals] nulo). */
+    fun build(range: ClosedRange<LocalDate>, days: List<DailyTotals>, goals: List<NutritionGoal>): List<PeriodDay> {
+        val byDate = days.filter { it.entryCount > 0 }.associateBy { it.date }
+        return Periods.days(range).map { d -> PeriodDay(d, byDate[d], goals.goalOn(d)) }
+    }
+
+    /** Média de uma meta sobre os dias com registro (a meta pode mudar no meio do período). */
+    fun averageGoal(days: List<PeriodDay>, select: (NutritionGoal) -> Double?): Double? =
+        days.filter { it.totals != null }.mapNotNull { it.goal?.let(select) }.takeIf { it.isNotEmpty() }?.average()
+}
+
+/** Agrupa itens por refeição: refeições ativas (mesmo vazias) e inativas que tenham itens, na ordem do dia. */
+object SlotGrouping {
+    fun <T> group(slots: List<MealSlot>, items: List<T>, slotOf: (T) -> Long, consumedOf: (T) -> Map<Nutrient, NutrientValue>): List<SlotGroup<T>> {
+        val bySlot = items.groupBy(slotOf)
+        return slots.sortedBy { it.sortOrder }
+            .filter { it.isActive || !bySlot[it.id].isNullOrEmpty() }
+            .map { slot -> bySlot[slot.id].orEmpty().let { list -> SlotGroup(slot, list, NutrientAggregator.sum(list.map(consumedOf))) } }
     }
 }
 

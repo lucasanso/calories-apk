@@ -18,6 +18,16 @@ import com.calories.data.repository.FoodRepositoryImpl
 import com.calories.data.repository.GoalRepositoryImpl
 import com.calories.data.repository.MealSlotRepositoryImpl
 import com.calories.data.repository.MealTemplateRepositoryImpl
+import com.calories.data.repository.PlanRepositoryImpl
+import com.calories.data.repository.ShoppingRepositoryImpl
+import com.calories.data.repository.WeightRepositoryImpl
+import com.calories.domain.model.ApplyMode
+import com.calories.domain.model.WeightRecord
+import com.calories.domain.usecase.AddFoodToPlan
+import com.calories.domain.usecase.ApplyPlanToDates
+import com.calories.domain.usecase.CreatePlan
+import com.calories.domain.usecase.GenerateShoppingList
+import com.calories.ui.format.Fmt
 import com.calories.domain.model.CustomFoodDraft
 import com.calories.domain.model.FoodFilter
 import com.calories.domain.model.GoalOrigin
@@ -27,6 +37,7 @@ import com.calories.domain.nutrition.Nutrient
 import com.calories.domain.nutrition.Preparation
 import com.calories.domain.usecase.AddFoodToMeal
 import kotlinx.coroutines.flow.first
+import org.junit.After
 import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
@@ -50,7 +61,8 @@ class ScreenshotTest {
     @get:Rule val rule = createEmptyComposeRule()
     private val out = File("build/screenshots")
 
-    @Before fun enabled() = assumeTrue(System.getProperty("calories.screenshots") == "true")
+    @Before fun enabled() { assumeTrue(System.getProperty("calories.screenshots") == "true"); DialogLayoutIdling.install() }
+    @After fun tearDown() = DialogLayoutIdling.uninstall()
 
     @Test
     fun light() {
@@ -96,7 +108,7 @@ class ScreenshotTest {
             sc.saveScreenshot(out, "09-calculadora")
             rule.onNodeWithContentDescription("Voltar").performClick()
             rule.onNodeWithContentDescription("Voltar").performClick()
-            rule.onNodeWithText("Histórico").performClick(); rule.waitForText("Ontem"); rule.waitForIdle()
+            rule.onNodeWithText("Histórico").performClick(); rule.waitForText("média kcal/dia"); rule.waitForIdle()
             sc.saveScreenshot(out, "10-historico")
         }
     }
@@ -111,6 +123,89 @@ class ScreenshotTest {
             rule.onNodeWithText("Alimentos").performClick(); rule.waitForText("alimento(s)", substring = true); rule.waitForIdle()
             sc.saveScreenshot(out, "12-alimentos-escuro")
         }
+    }
+
+    @Test
+    fun planning() {
+        seed()
+        val today = LocalDate.now()
+        seedPlanning(today)
+        ActivityScenario.launch(MainActivity::class.java).use { sc ->
+            rule.waitForText("Consumido")
+            rule.onNodeWithText("Histórico").performClick(); rule.waitForText("média kcal/dia")
+            rule.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Proporção da energia", substring = true)); rule.waitForIdle()
+            sc.saveScreenshot(out, "13-historico-macros")
+            rule.onNode(hasScrollToNodeAction()).performScrollToNode(hasText("Semana"))
+            rule.onNodeWithText("Mês").performClick(); rule.waitForText(Fmt.monthYear(java.time.YearMonth.from(today))); rule.waitForIdle()
+            sc.saveScreenshot(out, "14-historico-mes")
+            rule.onNodeWithText("Peso").performClick(); rule.waitForText("Peso atual"); rule.waitForText("Média de 7 registros"); rule.waitForIdle()
+            sc.saveScreenshot(out, "15-peso")
+            rule.onNodeWithText("Planejar").performClick(); rule.waitForText("dia(s) planejados", substring = true); rule.waitForIdle()
+            sc.saveScreenshot(out, "16-calendario")
+            rule.onNodeWithContentDescription(Fmt.fullDate(today.plusDays(1)), substring = true).performClick()
+            rule.waitForText("planejadas", substring = true); rule.waitForText("Frango, peito, sem pele, grelhado"); rule.waitForIdle()
+            sc.saveScreenshot(out, "17-dia-planejado")
+            rule.onNodeWithContentDescription("Voltar").performClick()
+            rule.onNodeWithText("Planos").performClick(); rule.waitForText("Plano B — descanso"); rule.waitForIdle()
+            sc.saveScreenshot(out, "18-planos")
+            rule.onNodeWithText("Plano A — treino").performClick(); rule.waitForText("no dia", substring = true); rule.waitForIdle()
+            sc.saveScreenshot(out, "19-plano")
+            rule.onNodeWithContentDescription("Voltar").performClick()
+            rule.onNodeWithText("Compras").performClick(); rule.waitForText("comprados", substring = true)
+            rule.onAllNodesWithText("Compras ", substring = true).onFirst().performClick()
+            rule.waitForText("Feijão, carioca, cozido"); rule.waitForIdle()
+            sc.saveScreenshot(out, "20-lista-de-compras")
+            rule.onNodeWithContentDescription("Voltar").performClick()
+            rule.onNodeWithText("Ajustes").performClick(); rule.onNodeWithText("Dados e backup").performClick(); rule.waitForText("Levar para outro aparelho"); rule.waitForIdle()
+            sc.saveScreenshot(out, "21-dados-backup")
+        }
+    }
+
+    @Test
+    @Config(qualifiers = "w412dp-h915dp-night-xhdpi")
+    fun planningDark() {
+        seed()
+        seedPlanning(LocalDate.now())
+        ActivityScenario.launch(MainActivity::class.java).use { sc ->
+            rule.waitForText("Consumido")
+            rule.onNodeWithText("Planejar").performClick(); rule.waitForText("dia(s) planejados", substring = true); rule.waitForIdle()
+            sc.saveScreenshot(out, "22-calendario-escuro")
+            rule.onNodeWithText("Histórico").performClick(); rule.waitForText("média kcal/dia"); rule.waitForIdle()
+            sc.saveScreenshot(out, "23-historico-escuro")
+        }
+    }
+
+    /** Peso dos últimos 60 dias, dois planos aplicados na próxima semana e uma lista de compras. */
+    private fun seedPlanning(today: LocalDate) = withAppDatabase { db ->
+        val clock = Clock.systemDefaultZone()
+        val foods = FoodRepositoryImpl(db)
+        val plans = PlanRepositoryImpl(db, clock)
+        suspend fun id(q: String) = foods.search(q, FoodFilter.ALL, null).first().first().id
+        val weights = WeightRepositoryImpl(db, clock)
+        val noise = listOf(0.3, -0.2, 0.1, 0.4, -0.3, 0.0, 0.2, -0.1, 0.3, -0.2, 0.1, 0.0, -0.3, 0.2, 0.1, -0.1, 0.0, 0.2, -0.2, 0.1)
+        noise.forEachIndexed { i, n -> weights.save(WeightRecord(today.minusDays(57L - 3 * i), 80.4 - i * 0.14 + n, null)) }
+
+        val create = CreatePlan(plans)
+        val add = AddFoodToPlan(plans, foods)
+        val a = create("Plano A — treino", "Mais carboidrato antes do treino")
+        listOf(
+            1L to listOf("pao trigo frances" to 50.0, "ovo galinha inteiro cozido" to 100.0, "banana prata crua" to 100.0),
+            2L to listOf("arroz tipo 1 cozido" to 200.0, "feijao carioca cozido" to 120.0, "frango peito sem pele grelhado" to 150.0, "alface crespa crua" to 30.0),
+            3L to listOf("iogurte natural" to 170.0, "aveia flocos crua" to 30.0),
+            4L to listOf("batata doce cozida" to 200.0, "carne bovina patinho sem gordura grelhado" to 130.0, "brocolis cozido" to 80.0),
+        ).forEach { (slot, items) -> items.forEach { (q, g) -> add(a, slot, id(q), g) } }
+        val b = create("Plano B — descanso", null)
+        listOf(
+            1L to listOf("ovo galinha inteiro cozido" to 100.0, "mamao formosa cru" to 150.0),
+            2L to listOf("arroz tipo 1 cozido" to 120.0, "feijao carioca cozido" to 100.0, "frango peito sem pele grelhado" to 150.0),
+            4L to listOf("tilapia calor seco" to 150.0, "abobrinha italiana cozida" to 100.0),
+        ).forEach { (slot, items) -> items.forEach { (q, g) -> add(b, slot, id(q), g) } }
+        val apply = ApplyPlanToDates(plans)
+        val week = (1L..10L).map { today.plusDays(it) }
+        apply(a, week.filter { it.dayOfWeek.value in setOf(1, 3, 5) }, ApplyMode.REPLACE)
+        apply(b, week.filter { it.dayOfWeek.value !in setOf(1, 3, 5) }, ApplyMode.REPLACE)
+        GenerateShoppingList(plans, ShoppingRepositoryImpl(db), clock)(today.plusDays(1), today.plusDays(7))
+        Unit
     }
 
     @Test
@@ -139,11 +234,13 @@ class ScreenshotTest {
             3L to listOf("banana prata crua" to 100.0, "iogurte natural" to 170.0),
         )
         for ((slot, items) in day) for ((q, g) in items) add(today, slot, id(q), g)
-        for (d in 1L..3L) {
-            add(today.minusDays(d), 1, id("pao trigo frances"), 50.0 * d)
-            add(today.minusDays(d), 2, id("arroz tipo 1 cozido"), 150.0)
-            add(today.minusDays(d), 2, id("carne bovina patinho sem gordura grelhado"), 120.0 + 20 * d)
-            add(today.minusDays(d), 4, id("batata doce cozida"), 200.0)
+        for (d in 1L..12L) {
+            add(today.minusDays(d), 1, id("pao trigo frances"), 50.0 * (1 + d % 3))
+            add(today.minusDays(d), 2, id("arroz tipo 1 cozido"), 150.0 + 10 * (d % 4))
+            add(today.minusDays(d), 2, id("feijao carioca cozido"), 100.0)
+            add(today.minusDays(d), 2, id("carne bovina patinho sem gordura grelhado"), 120.0 + 20 * (d % 3))
+            add(today.minusDays(d), 4, id("batata doce cozida"), 150.0 + 50 * (d % 2))
+            if (d % 4 == 0L) add(today.minusDays(d), 3, id("chocolate ao leite"), 60.0)
         }
         foods.setFavorite(id("frango peito sem pele grelhado"), true)
         foods.setFavorite(id("arroz tipo 1 cozido"), true)

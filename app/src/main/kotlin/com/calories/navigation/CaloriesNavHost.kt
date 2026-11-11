@@ -30,17 +30,21 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.calories.feature.data.DataRoute as DataScreen
 import com.calories.feature.foodpicker.FoodPickerRoute as FoodPickerScreen
 import com.calories.feature.foods.FoodDetailRoute as FoodDetailScreen
 import com.calories.feature.foods.FoodEditorRoute as FoodEditorScreen
 import com.calories.feature.foods.FoodsRoute as FoodsScreen
 import com.calories.feature.history.HistoryRoute as HistoryScreen
+import com.calories.feature.planning.PlanEditorRoute as PlanEditorScreen
+import com.calories.feature.planning.PlannedDayRoute as PlannedDayScreen
 import com.calories.feature.planning.PlanningRoute as PlanningScreen
 import com.calories.feature.settings.EnergyCalculatorRoute as EnergyCalculatorScreen
 import com.calories.feature.settings.GoalsRoute as GoalsScreen
 import com.calories.feature.settings.MealSlotsRoute as MealSlotsScreen
 import com.calories.feature.settings.SettingsRoute as SettingsScreen
 import com.calories.feature.settings.SourcesRoute as SourcesScreen
+import com.calories.feature.shopping.ShoppingListRoute as ShoppingListScreen
 import com.calories.feature.today.TodayRoute as TodayScreen
 import kotlin.reflect.KClass
 
@@ -96,19 +100,46 @@ fun CaloriesNavHost(nav: NavHostController = rememberNavController()) {
                     onAddFood = { date, slotId -> nav.navigate(FoodPickerRoute(date.toEpochDay(), slotId)) },
                     onOpenFood = { nav.navigate(FoodDetailRoute(it)) },
                     onOpenGoals = { nav.navigate(GoalsRoute) },
+                    onOpenPlanned = { nav.navigate(PlannedDayRoute(it.toEpochDay())) },
                 )
             }
             composable<FoodsRoute> {
                 FoodsScreen(onOpenFood = { nav.navigate(FoodDetailRoute(it)) }, onNewFood = { nav.navigate(FoodEditorRoute()) })
             }
-            composable<PlanningRoute> { PlanningScreen() }
+            composable<PlanningRoute> {
+                PlanningScreen(
+                    onOpenDay = { nav.navigate(PlannedDayRoute(it.toEpochDay())) },
+                    onOpenPlan = { nav.navigate(PlanEditorRoute(it)) },
+                    onOpenList = { nav.navigate(ShoppingListRoute(it)) },
+                )
+            }
+            composable<PlannedDayRoute> {
+                PlannedDayScreen(
+                    onBack = { nav.popBackStack() },
+                    onAddFood = { date, slotId -> nav.navigate(FoodPickerRoute(date.toEpochDay(), slotId, PickTarget.PLANNED_DAY)) },
+                    onOpenDiary = { date -> nav.navigate(TodayRoute(date.toEpochDay())) { popUpTo(nav.graph.findStartDestination().id) { inclusive = true } } },
+                )
+            }
+            composable<PlanEditorRoute> {
+                PlanEditorScreen(
+                    onBack = { nav.popBackStack() },
+                    onAddFood = { planId, slotId -> nav.navigate(FoodPickerRoute(0, slotId, PickTarget.PLAN, planId)) },
+                    onOpenPlan = { id -> nav.navigate(PlanEditorRoute(id)) { popUpTo<PlanEditorRoute> { inclusive = true } } },
+                )
+            }
+            composable<ShoppingListRoute> { ShoppingListScreen(onBack = { nav.popBackStack() }) }
             composable<HistoryRoute> {
                 HistoryScreen(onOpenDay = { date ->
                     nav.navigate(TodayRoute(date.toEpochDay())) { popUpTo(nav.graph.findStartDestination().id) { inclusive = true } }
                 })
             }
             composable<SettingsRoute> {
-                SettingsScreen(onGoals = { nav.navigate(GoalsRoute) }, onMealSlots = { nav.navigate(MealSlotsRoute) }, onSources = { nav.navigate(SourcesRoute) })
+                SettingsScreen(
+                    onGoals = { nav.navigate(GoalsRoute) },
+                    onMealSlots = { nav.navigate(MealSlotsRoute) },
+                    onData = { nav.navigate(DataRoute) },
+                    onSources = { nav.navigate(SourcesRoute) },
+                )
             }
             composable<FoodPickerRoute> { FoodPickerScreen(onBack = { nav.popBackStack() }) }
             composable<FoodDetailRoute> {
@@ -128,6 +159,7 @@ fun CaloriesNavHost(nav: NavHostController = rememberNavController()) {
             composable<EnergyCalculatorRoute> { EnergyCalculatorScreen(onBack = { nav.popBackStack() }) }
             composable<MealSlotsRoute> { MealSlotsScreen(onBack = { nav.popBackStack() }) }
             composable<SourcesRoute> { SourcesScreen(onBack = { nav.popBackStack() }) }
+            composable<DataRoute> { DataScreen(onBack = { nav.popBackStack() }) }
         }
     }
 }

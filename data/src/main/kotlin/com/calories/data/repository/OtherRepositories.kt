@@ -56,6 +56,8 @@ class GoalRepositoryImpl @Inject constructor(private val db: CaloriesDatabase, p
     )
 
     override suspend fun goalsBetween(from: LocalDate, to: LocalDate): List<NutritionGoal> = dao.goalsUntil(to.toEpochDay()).map { it.toDomain() }
+
+    override fun observeGoals(): Flow<List<NutritionGoal>> = dao.observeGoalsUntil(Long.MAX_VALUE).map { list -> list.map { it.toDomain() } }
 }
 
 class MealTemplateRepositoryImpl @Inject constructor(private val db: CaloriesDatabase, private val clock: Clock) : MealTemplateRepository {

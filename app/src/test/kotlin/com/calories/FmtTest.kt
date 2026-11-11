@@ -60,4 +60,20 @@ class FmtTest {
         assertEquals("Ontem", Fmt.relativeDate(today.minusDays(1), today))
         assertEquals("07:00", Fmt.time(420))
     }
+
+    @Test
+    fun `periodos, meses, dias da semana e quantidades de compras`() {
+        val today = LocalDate.of(2026, 11, 11)
+        assertEquals("9 a 15 de nov.", Fmt.period(LocalDate.of(2026, 11, 9), LocalDate.of(2026, 11, 15), today))
+        assertEquals("26 de out. a 1 de nov.", Fmt.period(LocalDate.of(2026, 10, 26), LocalDate.of(2026, 11, 1), today))
+        assertEquals("29 de dez. a 4 de jan. de 2027", Fmt.period(LocalDate.of(2026, 12, 29), LocalDate.of(2027, 1, 4), today))
+        assertEquals("Novembro de 2026", Fmt.monthYear(java.time.YearMonth.of(2026, 11)))
+        assertEquals("seg", Fmt.weekdayShort(java.time.DayOfWeek.MONDAY))
+        assertEquals("sáb", Fmt.weekdayShort(java.time.DayOfWeek.SATURDAY))
+        assertEquals("11/11/2026", Fmt.shortDate(today))
+        assertEquals("05/01", Fmt.dayMonth(LocalDate.of(2026, 1, 5)))
+        assertEquals("1.050 g", Fmt.quantity(1050.0, "g"))
+        assertEquals("2,5", Fmt.quantity(2.5, null))
+        assertEquals("", Fmt.quantity(null, "g"))
+    }
 }

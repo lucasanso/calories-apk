@@ -6,9 +6,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.calories.domain.model.DaySummary
 import com.calories.domain.model.MealSlot
+import com.calories.domain.nutrition.NutrientAggregator
 import com.calories.domain.repository.MealSlotRepository
+import com.calories.domain.repository.PlanRepository
 import com.calories.domain.usecase.ClearMeal
 import com.calories.domain.usecase.CopyMeal
+import com.calories.domain.usecase.LogPlannedDay
 import com.calories.domain.usecase.MoveEntry
 import com.calories.domain.usecase.ObserveDaySummary
 import com.calories.domain.usecase.RemoveEntry
@@ -25,12 +28,16 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.LocalDate
 import javax.inject.Inject
+
+/** Resumo do que está planejado para o dia mostrado (atalho para registrar). */
+data class PlannedSummary(val itemCount: Int, val energyKcal: Double)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -45,6 +52,8 @@ class TodayViewModel @Inject constructor(
     private val copyMeal: CopyMeal,
     private val clearMeal: ClearMeal,
     private val saveMealAsTemplate: SaveMealAsTemplate,
+    plans: PlanRepository,
+    private val logPlannedDay: LogPlannedDay,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -54,6 +63,10 @@ class TodayViewModel @Inject constructor(
     val date: StateFlow<LocalDate> = _date.asStateFlow()
 
     val summary: StateFlow<DaySummary?> = _date.flatMapLatest { observeDaySummary(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    val planned: StateFlow<PlannedSummary?> = _date.flatMapLatest { plans.observePlannedDay(it) }
+        .map { items -> items.takeIf { it.isNotEmpty() }?.let { list -> PlannedSummary(list.size, NutrientAggregator.sum(list.map { it.consumed }).energyKcal) } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val slots: StateFlow<List<MealSlot>> = slots.observeSlots().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -84,6 +97,11 @@ class TodayViewModel @Inject constructor(
     }
 
     fun clear(slotId: Long) = launchSafely { clearMeal(_date.value, slotId) }
+
+    fun logPlanned() = launchSafely {
+        val n = logPlannedDay(_date.value)
+        _events.send(UiEvent.Message("$n alimento(s) planejados registrados"))
+    }
 
     fun saveAsTemplate(slotId: Long, name: String) = launchSafely {
         saveMealAsTemplate(_date.value, slotId, name)

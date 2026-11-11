@@ -68,6 +68,8 @@ interface GoalRepository {
     /** Grava a meta a partir de `goal.effectiveFrom` (substitui a do mesmo dia). */
     suspend fun setGoal(goal: NutritionGoal)
     suspend fun goalsBetween(from: LocalDate, to: LocalDate): List<NutritionGoal>
+    /** Todas as metas, em ordem de vigência (para gráficos de períodos). */
+    fun observeGoals(): Flow<List<NutritionGoal>>
 }
 
 interface MealTemplateRepository {

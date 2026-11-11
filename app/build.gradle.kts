@@ -16,8 +16,8 @@ android {
         applicationId = "com.calories"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 4
+        versionName = "0.4.0"
     }
     // Chave de assinatura fora do Git (keystore.properties e keystore/ estão no .gitignore).
     val keystoreFile = rootProject.file("keystore.properties")
@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     debugImplementation(libs.compose.ui.tooling)
 
+    testImplementation(libs.androidx.test.espresso.idling)
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.kotlinx.coroutines.test)

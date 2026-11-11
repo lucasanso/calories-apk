@@ -247,6 +247,7 @@ class UseCasesTest {
         override suspend fun goalFor(date: LocalDate) = goal
         override suspend fun setGoal(goal: NutritionGoal) { this.goal = goal }
         override suspend fun goalsBetween(from: LocalDate, to: LocalDate) = listOfNotNull(goal)
+        override fun observeGoals() = flowOf(listOfNotNull(goal))
     }
 
     private class FakeTemplates(private val foods: FakeFoods) : MealTemplateRepository {

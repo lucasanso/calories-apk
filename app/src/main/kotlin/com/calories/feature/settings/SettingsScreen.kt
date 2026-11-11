@@ -12,6 +12,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.MenuBook
@@ -61,6 +62,7 @@ class SettingsViewModel @Inject constructor(private val repo: SettingsRepository
 fun SettingsRoute(
     onGoals: () -> Unit,
     onMealSlots: () -> Unit,
+    onData: () -> Unit,
     onSources: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -72,6 +74,8 @@ fun SettingsRoute(
                 NavItem(Icons.Outlined.Flag, "Metas nutricionais", "Calorias, macronutrientes e fibras; calculadora de estimativa", onGoals)
                 HorizontalDivider()
                 NavItem(Icons.Outlined.Restaurant, "Refeições do dia", "Nomes, horários e ordem", onMealSlots)
+                HorizontalDivider()
+                NavItem(Icons.Outlined.Storage, "Dados e backup", "Exportar CSV, backup, restaurar e levar para outro aparelho", onData)
                 HorizontalDivider()
                 NavItem(Icons.Outlined.MenuBook, "Fontes e licenças", "TACO, USDA e versão da biblioteca", onSources)
             }

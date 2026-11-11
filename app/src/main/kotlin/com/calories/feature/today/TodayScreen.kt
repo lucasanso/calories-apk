@@ -82,11 +82,13 @@ fun TodayRoute(
     onAddFood: (LocalDate, Long) -> Unit,
     onOpenFood: (Long) -> Unit,
     onOpenGoals: () -> Unit,
+    onOpenPlanned: (LocalDate) -> Unit,
     viewModel: TodayViewModel = hiltViewModel(),
 ) {
     val date by viewModel.date.collectAsStateWithLifecycle()
     val summary by viewModel.summary.collectAsStateWithLifecycle()
     val slots by viewModel.slots.collectAsStateWithLifecycle()
+    val planned by viewModel.planned.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     LaunchedEffect(Unit) {
         viewModel.events.collect { e ->
@@ -101,6 +103,7 @@ fun TodayRoute(
         today = viewModel.today,
         summary = summary,
         slots = slots,
+        planned = planned,
         snackbar = snackbar,
         onPreviousDay = viewModel::previousDay,
         onNextDay = viewModel::nextDay,
@@ -114,6 +117,8 @@ fun TodayRoute(
         onRepeatPreviousDay = viewModel::repeatPreviousDay,
         onClear = viewModel::clear,
         onSaveTemplate = viewModel::saveAsTemplate,
+        onOpenPlanned = { onOpenPlanned(date) },
+        onLogPlanned = viewModel::logPlanned,
     )
 }
 
@@ -124,6 +129,7 @@ fun TodayScreen(
     today: LocalDate,
     summary: DaySummary?,
     slots: List<MealSlot>,
+    planned: PlannedSummary?,
     snackbar: SnackbarHostState,
     onPreviousDay: () -> Unit,
     onNextDay: () -> Unit,
@@ -137,8 +143,11 @@ fun TodayScreen(
     onRepeatPreviousDay: (Long) -> Unit,
     onClear: (Long) -> Unit,
     onSaveTemplate: (Long, String) -> Unit,
+    onOpenPlanned: () -> Unit,
+    onLogPlanned: () -> Unit,
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
+    var confirmLog by remember { mutableStateOf(false) }
     var editing by remember { mutableStateOf<DiaryEntry?>(null) }
     var templateFor by remember { mutableStateOf<MealSummary?>(null) }
 
@@ -172,6 +181,7 @@ fun TodayScreen(
         ) {
             item(key = "summary") { SummaryCard(summary, onOpenGoals) }
             item(key = "macros") { MacrosCard(summary) }
+            planned?.let { p -> item(key = "planned") { PlannedCard(p, onOpen = onOpenPlanned, onLog = { confirmLog = true }) } }
             items(summary.meals, key = { "meal-${it.slotId}-${it.mealId}" }) { meal ->
                 MealCard(
                     meal = meal,
@@ -204,6 +214,16 @@ fun TodayScreen(
         EntrySheet(entry, slots, onDismiss = { editing = null }, onSave = { onUpdateAmount(entry.id, it); editing = null },
             onDelete = { onDelete(entry.id); editing = null }, onMove = { onMove(entry.id, it); editing = null },
             onOpenFood = entry.foodId?.let { id -> { editing = null; onOpenFood(id) } })
+    }
+
+    if (confirmLog) {
+        AlertDialog(
+            onDismissRequest = { confirmLog = false },
+            title = { Text("Registrar o planejado?") },
+            text = { Text("${planned?.itemCount ?: 0} alimento(s) planejados entram no diário deste dia. O que já estiver registrado continua lá.") },
+            confirmButton = { TextButton(onClick = { confirmLog = false; onLogPlanned() }) { Text("Registrar") } },
+            dismissButton = { TextButton(onClick = { confirmLog = false }) { Text("Cancelar") } },
+        )
     }
 
     templateFor?.let { meal ->
@@ -241,6 +261,18 @@ private fun SummaryCard(summary: DaySummary, onOpenGoals: () -> Unit) {
                     TextButton(onClick = onOpenGoals, contentPadding = PaddingValues(0.dp)) { Text("Definir meta") }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun PlannedCard(planned: PlannedSummary, onOpen: () -> Unit, onLog: () -> Unit) {
+    SectionCard(padding = PaddingValues(start = 16.dp, end = 8.dp, top = 12.dp, bottom = 4.dp)) {
+        Text("Planejado para este dia", style = MaterialTheme.typography.titleSmall)
+        Text("${planned.itemCount} alimento(s) · ${Fmt.kcal(planned.energyKcal)} kcal", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            TextButton(onClick = onOpen) { Text("Ver plano") }
+            TextButton(onClick = onLog) { Text("Registrar no diário") }
         }
     }
 }

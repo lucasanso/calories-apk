@@ -46,21 +46,28 @@ import com.calories.domain.model.MealTemplate
 import com.calories.domain.repository.FoodRepository
 import com.calories.domain.repository.MealSlotRepository
 import com.calories.domain.repository.MealTemplateRepository
+import com.calories.domain.repository.PlanRepository
 import com.calories.domain.usecase.AddFoodToMeal
+import com.calories.domain.usecase.AddFoodToPlan
+import com.calories.domain.usecase.AddFoodToPlannedDay
 import com.calories.domain.usecase.ApplyMealTemplate
 import com.calories.feature.foods.FoodFilterRow
 import com.calories.feature.foods.FoodResults
 import com.calories.feature.foods.FoodSearchField
 import com.calories.feature.foods.FoodSearchState
 import com.calories.navigation.FoodPickerRoute
+import com.calories.navigation.PickTarget
 import com.calories.ui.UiEvent
 import com.calories.ui.components.EmptyState
 import com.calories.ui.components.QuantitySheet
 import com.calories.ui.format.Fmt
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -73,17 +80,24 @@ class FoodPickerViewModel @Inject constructor(
     private val foods: FoodRepository,
     slots: MealSlotRepository,
     templates: MealTemplateRepository,
+    plans: PlanRepository,
     private val addFoodToMeal: AddFoodToMeal,
+    private val addFoodToPlannedDay: AddFoodToPlannedDay,
+    private val addFoodToPlan: AddFoodToPlan,
     private val applyMealTemplate: ApplyMealTemplate,
 ) : ViewModel() {
     private val route = savedStateHandle.toRoute<FoodPickerRoute>()
+    val target: PickTarget = route.target
     val date: LocalDate = LocalDate.ofEpochDay(route.epochDay)
     val search = FoodSearchState(foods)
     val results: StateFlow<List<Food>?> = search.results.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
     val categories: StateFlow<List<FoodCategory>> = foods.observeCategories().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
     val templates: StateFlow<List<MealTemplate>> = templates.observeTemplates().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-    private val _slot = kotlinx.coroutines.flow.MutableStateFlow<MealSlot?>(null)
+    private val _slot = MutableStateFlow<MealSlot?>(null)
     val slot: StateFlow<MealSlot?> = _slot
+    /** Nome do plano quando o destino é um plano. */
+    val planName: StateFlow<String?> = (if (target == PickTarget.PLAN) plans.observePlan(route.planId).map { it?.name } else flowOf(null))
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     private val _events = Channel<UiEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
@@ -92,14 +106,25 @@ class FoodPickerViewModel @Inject constructor(
 
     suspend fun lastAmount(foodId: Long): Double? = foods.lastAmount(foodId)
 
+    private suspend fun addTo(foodId: Long, amount: Double) {
+        when (target) {
+            PickTarget.DIARY -> addFoodToMeal(date, route.slotId, foodId, amount)
+            PickTarget.PLANNED_DAY -> addFoodToPlannedDay(date, route.slotId, foodId, amount)
+            PickTarget.PLAN -> addFoodToPlan(route.planId, route.slotId, foodId, amount)
+        }
+    }
+
     fun add(food: Food, amount: Double) = viewModelScope.launch {
-        runCatching { addFoodToMeal(date, route.slotId, food.id, amount) }
+        runCatching { addTo(food.id, amount) }
             .onSuccess { _events.send(UiEvent.Message("${food.name} · ${Fmt.amount(amount, food.profile.referenceUnit)} adicionado")) }
             .onFailure { _events.send(UiEvent.Message(it.message ?: "Não foi possível adicionar")) }
     }
 
     fun applyTemplate(template: MealTemplate) = viewModelScope.launch {
-        runCatching { applyMealTemplate(template.id, date, route.slotId) }
+        runCatching {
+            if (target == PickTarget.DIARY) applyMealTemplate(template.id, date, route.slotId)
+            else template.items.count { item -> runCatching { addTo(item.foodId, item.amount) }.isSuccess }
+        }
             .onSuccess { _events.send(UiEvent.Message("“${template.name}” aplicada ($it alimento(s))")); _events.send(UiEvent.Close) }
             .onFailure { _events.send(UiEvent.Message(it.message ?: "Não foi possível aplicar")) }
     }
@@ -115,6 +140,7 @@ fun FoodPickerRoute(onBack: () -> Unit, viewModel: FoodPickerViewModel = hiltVie
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val templates by viewModel.templates.collectAsStateWithLifecycle()
     val slot by viewModel.slot.collectAsStateWithLifecycle()
+    val planName by viewModel.planName.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var showTemplates by remember { mutableStateOf(false) }
@@ -136,7 +162,12 @@ fun FoodPickerRoute(onBack: () -> Unit, viewModel: FoodPickerViewModel = hiltVie
                 title = {
                     Column {
                         Text("Adicionar em ${slot?.name ?: ""}", style = MaterialTheme.typography.titleLarge)
-                        Text(Fmt.fullDate(viewModel.date), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        val context = when (viewModel.target) {
+                            PickTarget.DIARY -> Fmt.fullDate(viewModel.date)
+                            PickTarget.PLANNED_DAY -> "Planejamento · ${Fmt.fullDate(viewModel.date)}"
+                            PickTarget.PLAN -> "Plano ${planName.orEmpty()}"
+                        }
+                        Text(context, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar") } },
