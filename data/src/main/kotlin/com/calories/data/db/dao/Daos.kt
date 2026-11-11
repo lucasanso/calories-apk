@@ -104,8 +104,12 @@ interface CustomFoodDao {
     @Query("UPDATE food SET isArchived = 1 WHERE id = :id AND origin = 'CUSTOM'")
     suspend fun archive(id: Long): Int
 
-    @Query("SELECT COUNT(*) FROM meal_template_item WHERE foodId = :id")
-    suspend fun templateReferences(id: Long): Int
+    /** Referências que impedem a exclusão (refeições favoritas, planos e calendário). */
+    @Query(
+        "SELECT (SELECT COUNT(*) FROM meal_template_item WHERE foodId = :id) + (SELECT COUNT(*) FROM diet_plan_item WHERE foodId = :id) + " +
+            "(SELECT COUNT(*) FROM planned_item WHERE foodId = :id)",
+    )
+    suspend fun references(id: Long): Int
 }
 
 /** Escrita da biblioteca original: usada SOMENTE pelo LibrarySeeder. */

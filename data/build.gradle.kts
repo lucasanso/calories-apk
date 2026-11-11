@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.room)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -31,6 +32,9 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
+// Esquemas exportados também como assets de teste (MigrationTestHelper).
+android.sourceSets.getByName("test").assets.srcDir("$projectDir/schemas")
+
 dependencies {
     api(project(":domain"))
     implementation(project(":library-format"))
@@ -41,6 +45,7 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlin.test.junit)

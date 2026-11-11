@@ -61,4 +61,8 @@ abstract class RepositoryModule {
     @Binds abstract fun settings(impl: SettingsRepositoryImpl): SettingsRepository
     @Binds abstract fun library(impl: LibrarySeeder): LibraryRepository
     @Binds abstract fun assetSource(impl: AndroidLibraryAssetSource): LibraryAssetSource
+    @Binds abstract fun weights(impl: com.calories.data.repository.WeightRepositoryImpl): com.calories.domain.repository.WeightRepository
+    @Binds abstract fun plans(impl: com.calories.data.repository.PlanRepositoryImpl): com.calories.domain.repository.PlanRepository
+    @Binds abstract fun shopping(impl: com.calories.data.repository.ShoppingRepositoryImpl): com.calories.domain.repository.ShoppingRepository
+    @Binds abstract fun backup(impl: com.calories.data.backup.BackupRepositoryImpl): com.calories.domain.repository.BackupRepository
 }

@@ -112,7 +112,7 @@ class FoodRepositoryImpl @Inject constructor(private val db: CaloriesDatabase) :
     }
 
     override suspend fun deleteCustom(id: Long): Boolean =
-        if (custom.templateReferences(id) > 0) { custom.archive(id); false } else custom.delete(id) == 1
+        if (custom.references(id) > 0) { custom.archive(id); false } else custom.delete(id) == 1
 
     override suspend fun setFavorite(id: Long, favorite: Boolean) {
         val current = usage.get(id) ?: FoodUsageEntity(id, false, 0, null, null)
