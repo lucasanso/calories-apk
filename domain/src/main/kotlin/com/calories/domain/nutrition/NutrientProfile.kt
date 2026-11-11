@@ -7,7 +7,7 @@ package com.calories.domain.nutrition
 data class NutrientProfile(
     val referenceAmount: Double,
     val referenceUnit: MeasureUnit,
-    private val values: Map<Nutrient, NutrientValue>,
+    val values: Map<Nutrient, NutrientValue>,
 ) {
     init {
         require(referenceAmount.isFinite() && referenceAmount > 0.0) {

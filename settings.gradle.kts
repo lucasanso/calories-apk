@@ -19,8 +19,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "Calories"
 
-// Fase 2: módulos JVM da biblioteca nutricional.
-// Fase 3 acrescenta :app e :data (Android).
+include(":app")
+include(":data")
 include(":domain")
 include(":library-format")
 include(":tools:food-importer")
