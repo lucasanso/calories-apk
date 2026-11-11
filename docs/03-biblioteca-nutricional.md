@@ -1,6 +1,8 @@
 # 3. Biblioteca nutricional
 
-> **Fase 2 concluída.** A biblioteca inicial tem **611 alimentos**: os 597 itens da TACO 4ª edição completa e 14 itens do USDA que cobrem lacunas da TACO.
+> **Biblioteca versão 2.** São **614 alimentos**: os 597 itens da TACO 4ª edição completa e 17 itens do USDA que cobrem lacunas da TACO.
+>
+> A versão 2 (Fase 3) acrescentou o leite fluido. Na TACO, energia e macronutrientes do leite fluido estão marcados com `*`, ou seja, "em reavaliação" (§3.7).
 >
 > - Os valores vêm dos arquivos oficiais, sem nenhum valor digitado à mão.
 > - Nada foi arredondado nem recalculado além do que a própria fonte publica.
@@ -13,7 +15,7 @@
 | Fonte | Arquivos oficiais (versionados em `nutrition-data/raw/`) | Papel | Itens |
 |---|---|---|---|
 | **TACO**: Tabela Brasileira de Composição de Alimentos, 4ª ed. revisada e ampliada (NEPA/UNICAMP, 2011) | Planilha `Taco-4a-Edicao.xlsx` e PDF `taco_4_edicao_ampliada_e_revisada.pdf`, ambos do site do NEPA | Base principal | 597 (tabela completa) |
-| **USDA FoodData Central**: SR Legacy (abril de 2018) | `FoodData_Central_sr_legacy_food_csv_2018-04.zip` | Só lacunas da TACO, marcadas como "referência internacional" | 14 |
+| **USDA FoodData Central**: SR Legacy (abril de 2018) | `FoodData_Central_sr_legacy_food_csv_2018-04.zip` | Só lacunas da TACO, marcadas como "referência internacional" | 17 |
 | **TBCA** (FoRC/USP) | — | **Não usada** (§3.2) | 0 |
 
 URLs, data de acesso e SHA-256 de cada arquivo estão em [`nutrition-data/sources.lock.json`](../nutrition-data/sources.lock.json). O importador recusa qualquer arquivo cujo hash não confira.
@@ -119,9 +121,9 @@ Linhas não comparáveis: 0. As únicas diferenças entre os dois arquivos são 
 
 ### Valores de ouro
 
-Há 213 valores conferidos **por um caminho independente do importador**:
+Há 234 valores conferidos **por um caminho independente do importador**:
 - TACO: 17 alimentos prioritários, extraídos do PDF com `pdftotext` (Poppler), não com PDFBox.
-- USDA: os 14 itens, extraídos do dataset **JSON** oficial (o importador lê o CSV).
+- USDA: os 17 itens, extraídos do dataset **JSON** oficial (o importador lê o CSV).
 
 O JSON do USDA publica 3 algarismos significativos (30,86 no CSV → 30,9 no JSON), por isso esses valores são comparados com tolerância de meia unidade nesse algarismo. Todos conferem.
 
@@ -161,7 +163,7 @@ Decisões humanas ficam em CSVs revisáveis, sempre com justificativa:
 | `category-overrides.csv` | 51 exceções. Exemplos: batata, mandioca e derivados → Carboidratos; abacate e amendoim → Gorduras; cuscuz e tapioca → Carboidratos, como no requisito. |
 | `preparation-overrides.csv` | 98 itens cuja descrição não traz palavra de preparo (pães, polpas congeladas, sucos, embutidos, "à milanesa"…). As decisões citam o protocolo do Apêndice 2 da TACO quando ele existe. |
 | `aliases.csv` | 80 sinônimos de busca (aipim, macaxeira, castanha-do-pará, carne magra…) |
-| `usda-foods.csv` | Os 14 itens do USDA, com nome em português e justificativa |
+| `usda-foods.csv` | Os 17 itens do USDA, com nome em português e justificativa |
 | `source-corrections.csv` | Correções **de texto** (nunca de valores) |
 | `taco-pdf-deviations.csv` | Divergências conhecidas entre planilha e PDF |
 | `value-exclusions.csv` | Valores fisicamente impossíveis descartados (viram "sem dado"; nunca substituídos) |
@@ -219,9 +221,9 @@ Todos os 60 itens do requisito estão mapeados. A tabela completa, com as chaves
 
 | Situação | Itens |
 |---|---|
-| ✅ Na TACO | Peito e coxa de frango, patinho, acém, alcatra (miolo), salmão, atum, sardinha, ovo, clara, leite, iogurte natural, arroz branco e integral, feijão carioca e preto, batata, batata-doce, mandioca, aveia, pão francês, pão integral, cuscuz, banana, maçã, mamão, laranja, azeite, amendoim, castanha-do-pará, castanha-de-caju, abacate, manteiga, óleo de soja, os 10 vegetais, café, açúcar, mel, suco de laranja, água de coco |
+| ✅ Na TACO | Peito e coxa de frango, patinho, acém, alcatra (miolo), salmão, atum, sardinha, ovo, clara, leite em pó, iogurte natural, arroz branco e integral, feijão carioca e preto, batata, batata-doce, mandioca, aveia, pão francês, pão integral, cuscuz, banana, maçã, mamão, laranja, azeite, amendoim, castanha-do-pará, castanha-de-caju, abacate, manteiga, óleo de soja, os 10 vegetais, café, açúcar, mel, suco de laranja, água de coco |
 | 🔷 Sem item único | "Carne bovina magra" (sinônimo para 10 cortes magros) e "carne moída" (acém moído; a composição depende do corte) |
-| 🌎 Lacuna na TACO, coberta pelo USDA | Tilápia (crua e cozida), queijo cottage, macarrão cozido, pasta de amendoim, whey protein (genérico), chocolate amargo 60–85% (a TACO tem "meio amargo", que continua disponível) |
+| 🌎 Lacuna na TACO, coberta pelo USDA | Leite fluido integral, semidesnatado e desnatado (na TACO, energia e macros estão em reavaliação), tilápia (crua e cozida), queijo cottage, macarrão cozido, pasta de amendoim, whey protein (genérico), chocolate amargo 60–85% (a TACO tem "meio amargo", que continua disponível) |
 | 🏷️ Melhor pelo rótulo | Iogurte proteico (há iogurte grego do USDA como referência, não como equivalente), granola (receita caseira do USDA como referência), goma de tapioca (a TACO tem "Tapioca, com manteiga") |
 
 ## 3.8 Importação no app (Fase 3)

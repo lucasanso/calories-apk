@@ -37,7 +37,7 @@ nutrition-data/
 | Fonte | Licença | Uso |
 |---|---|---|
 | TACO 4ª ed. (NEPA/UNICAMP, 2011) | "É permitida a reprodução total ou parcial do material, desde que seja citada a fonte." | Tabela completa (597 itens) |
-| USDA FoodData Central — SR Legacy (2018-04) | Domínio público, CC0 1.0 | 14 itens que faltam na TACO |
+| USDA FoodData Central — SR Legacy (2018-04) | Domínio público, CC0 1.0 | 17 itens que faltam na TACO |
 | TBCA (FoRC/USP) | "Não é permitida a reprodução total ou parcial do material." | Não incorporada |
 
 ## Comandos

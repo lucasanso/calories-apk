@@ -1,70 +1,106 @@
 # Calories
 
-Aplicativo Android pessoal de planejamento alimentar, controle nutricional e acompanhamento de dieta. Funciona offline, sem conta e sem servidor. Os dados ficam no aparelho.
+Aplicativo Android pessoal de planejamento alimentar, controle nutricional e acompanhamento de dieta. Funciona offline, sem conta e sem servidor; os dados ficam no aparelho.
 
-> **Status: Fase 2 concluída (biblioteca nutricional).**
+> **APK:** [`release/Calories-0.3.0.apk`](release/Calories-0.3.0.apk). Versão 0.3.0 (Fase 3, MVP), assinado, 2,1 MB, Android 8.0 ou superior. Feito para o Galaxy S26 (Android 16).
 >
-> - Há 611 alimentos (TACO 4ª ed. completa + 14 lacunas do USDA) em [`app/src/main/assets/library/food_library.json`](app/src/main/assets/library/food_library.json).
-> - O asset é gerado por um importador reproduzível e validado contra os arquivos oficiais.
-> - Ainda não há o app Android: ele começa na Fase 3.
+> SHA-256: `8934ee475092643e7cc44583eb42de5bcefc5ac51a61fba4736ee74503e1742c`
 
-## O que o app fará
+## Capturas de tela
 
-- Diário alimentar por refeição, com cálculo automático de calorias, proteínas, carboidratos, gorduras, fibras, gordura saturada e sódio.
-- Biblioteca de alimentos pré-instalada a partir da TACO (NEPA/UNICAMP), com lacunas cobertas pelo USDA, sempre com fonte e estado de preparo identificados.
-- Alimentos personalizados, favoritos e modelos de refeição.
-- Metas configuráveis, com calculadora opcional de estimativa energética (identificada como aproximação).
-- Histórico diário, semanal e mensal com gráficos, registro de peso e comparação com as metas vigentes em cada data.
-- Planejamento em calendário com planos reutilizáveis (Plano A — Treino, Plano B — Descanso…).
-- Lista de compras consolidada a partir do planejamento.
-- Exportação CSV e JSON, backup e restauração locais.
+Telas renderizadas do app real, com dados de exemplo (o app começa vazio):
+
+| Hoje | Resumo do dia | Busca | Detalhe do alimento |
+|---|---|---|---|
+| ![](docs/screenshots/01-hoje.png) | ![](docs/screenshots/02-hoje-resumo.png) | ![](docs/screenshots/03-busca.png) | ![](docs/screenshots/05-detalhe.png) |
+
+| Novo alimento | Metas | Calculadora | Histórico |
+|---|---|---|---|
+| ![](docs/screenshots/06-novo-alimento.png) | ![](docs/screenshots/08-metas.png) | ![](docs/screenshots/09-calculadora.png) | ![](docs/screenshots/10-historico.png) |
+
+| Hoje (escuro) | Alimentos (escuro) | Alimentos | Ajustes |
+|---|---|---|---|
+| ![](docs/screenshots/11-hoje-escuro.png) | ![](docs/screenshots/12-alimentos-escuro.png) | ![](docs/screenshots/04-alimentos.png) | ![](docs/screenshots/07-ajustes.png) |
+
+## Instalação no Galaxy S26
+
+1. Copie `release/Calories-0.3.0.apk` para o celular (cabo USB, Google Drive, e-mail para si mesmo…).
+2. Abra o arquivo no app **Meus Arquivos**. Na primeira vez, o Android pede para permitir "Instalar apps desconhecidos" para o app usado para abrir: permita.
+3. Se o **Auto Blocker** da Samsung estiver ativo (Configurações › Segurança e privacidade › Auto Blocker), desative-o temporariamente para instalar.
+4. Na primeira abertura, o app importa a biblioteca de 614 alimentos (cerca de 1 segundo) e cria as cinco refeições padrão.
+
+Atualizações precisam ser assinadas com a **mesma chave**. A chave não fica no repositório (é pública); guarde o arquivo de chave que acompanha a entrega. Sem ela, uma versão nova exige desinstalar a anterior, e isso apaga os dados.
+
+## O que já funciona (Fase 3: MVP)
+
+| Área | O que faz |
+|---|---|
+| **Hoje** | Anel de calorias (consumido, meta, restante, % atingido), barras de proteínas, carboidratos, gorduras e fibras em relação às metas, refeições do dia com seus alimentos e kcal, resumo nutricional completo (inclui gordura saturada e sódio) com aviso de total parcial, navegação por datas. |
+| **Refeições** | Adicionar alimentos com quantidade em g (ou ml, para alimentos cadastrados por ml), editar quantidade, mover para outra refeição, remover com "Desfazer", repetir do dia anterior, limpar, salvar como refeição favorita e reaplicá-la. Refeições configuráveis: nome, horário, ordem, ativar e desativar. |
+| **Biblioteca** | 614 alimentos: TACO 4ª ed. completa, mais lacunas do USDA marcadas como referência internacional. Busca sem acento, por prefixo e por sinônimos ("aipim", "castanha-do-pará", "carne magra"). Filtros: recentes, favoritos, meus e categoria. |
+| **Detalhe do alimento** | Valores por 100 g com "Tr", "NA" e "—" explicados, calculadora de porção, observações da fonte, citação, favoritar. Alimentos da biblioteca são somente leitura: "Duplicar" cria uma versão sua. |
+| **Alimentos personalizados** | Nome, marca, categoria, preparo, base do rótulo (ex.: por 30 g ou por 100 ml), energia, proteínas, carboidratos e gorduras obrigatórios; saturada, fibras e sódio opcionais. Validação de plausibilidade (saturada > gordura, macros > 100 %, aviso de energia incoerente). Editar e excluir; se o alimento estiver numa refeição favorita, é arquivado. |
+| **Cálculo** | Valor consumido = valor de referência × quantidade ÷ quantidade de referência, sem arredondar; o arredondamento é só na tela (`HALF_UP`, pt-BR). O histórico guarda uma cópia dos valores usados: editar o alimento depois não altera o passado. |
+| **Metas** | Calorias, proteínas, carboidratos, gorduras e fibras, vigentes a partir da data em que foram definidas (dias anteriores mantêm a meta antiga). Calculadora opcional (Mifflin-St Jeor, fatores de atividade, objetivo e ajuste), identificada como aproximação e editável. |
+| **Histórico** | Dias registrados com consumo × meta e macros; toque abre o dia. |
+| **Privacidade** | Sem permissão de internet (verificado por teste), sem conta, sem anúncios. Backup em nuvem do Android desligado; a transferência direta entre aparelhos (Smart Switch) leva os dados. |
+| **Aparência** | Claro, escuro ou sistema; opção de cores do papel de parede (Material You). |
+
+**Próximas fases:** gráficos semanais e mensais, registro e gráfico de peso, planejamento em calendário (Plano A/B/C), lista de compras, exportação CSV/JSON, backup e restauração (Fase 4).
 
 ## Documentação
 
 | Documento | Conteúdo |
 |---|---|
-| [docs/01-arquitetura.md](docs/01-arquitetura.md) | Clean Architecture + MVVM, módulos, camadas, Hilt, decisões técnicas, estrutura de diretórios, bibliotecas e versões, privacidade, desempenho |
-| [docs/02-banco-de-dados.md](docs/02-banco-de-dados.md) | Modelagem Room: diagrama ER, tabelas, índices, separação biblioteca / personalizados / histórico / planejamento, snapshots, migrations, backup |
-| [docs/03-biblioteca-nutricional.md](docs/03-biblioteca-nutricional.md) | Fontes (TACO, USDA; por que não a TBCA), condições de uso verificadas, pipeline de importação, checagem cruzada, validação, curadoria, cobertura da lista inicial |
+| [docs/01-arquitetura.md](docs/01-arquitetura.md) | Clean Architecture + MVVM, módulos, camadas, Hilt, decisões técnicas, estrutura de diretórios, bibliotecas e versões, privacidade |
+| [docs/02-banco-de-dados.md](docs/02-banco-de-dados.md) | Modelagem Room: tabelas, índices, separação biblioteca / personalizados / histórico / planejamento, snapshots, migrations |
+| [docs/03-biblioteca-nutricional.md](docs/03-biblioteca-nutricional.md) | Fontes (TACO, USDA; por que não a TBCA), condições de uso, pipeline de importação, checagem cruzada, validação, curadoria, cobertura |
 | [nutrition-data/reports/import-report.md](nutrition-data/reports/import-report.md) | Relatório da última importação (gerado) |
-| [docs/04-calculo-nutricional.md](docs/04-calculo-nutricional.md) | Fórmulas, status de nutrientes (Tr, NA, ausente), agregação, unidades, arredondamento, metas, Mifflin-St Jeor, lista de compras, vetores de teste |
-| [docs/05-navegacao-e-interface.md](docs/05-navegacao-e-interface.md) | Grafo de navegação, telas das 5 abas, fluxos, diretrizes visuais, componentes |
-| [docs/06-plano-de-entrega.md](docs/06-plano-de-entrega.md) | Fases, estratégia de testes, entregáveis, riscos e decisões pendentes |
-| [nutrition-data/README.md](nutrition-data/README.md) | Organização dos dados de origem e como fornecer os arquivos oficiais |
+| [docs/04-calculo-nutricional.md](docs/04-calculo-nutricional.md) | Fórmulas, status de nutrientes, agregação, arredondamento, metas, Mifflin-St Jeor, vetores de teste |
+| [docs/05-navegacao-e-interface.md](docs/05-navegacao-e-interface.md) | Navegação, telas, fluxos, diretrizes visuais |
+| [docs/06-plano-de-entrega.md](docs/06-plano-de-entrega.md) | Fases, testes, entregáveis, riscos |
 
-## Biblioteca nutricional: comandos
+## Desenvolvimento
 
-Requer JDK 21. O wrapper baixa o Gradle 9.9.0.
+Requisitos: JDK 21 e Android SDK (platform 37, build-tools 36.1). O wrapper baixa o Gradle 9.9.0.
 
-Regerar o asset e o relatório a partir dos arquivos oficiais em `nutrition-data/raw/`:
-
-```bash
-./gradlew :tools:food-importer:generateFoodLibrary
-```
-
-Conferir que o asset commitado é exatamente o que o importador gera:
+APK de debug:
 
 ```bash
-./gradlew :tools:food-importer:verifyFoodLibrary
+./gradlew :app:assembleDebug
 ```
 
-Rodar os testes (domínio, formato do asset, importador e integração com os dados reais):
+APK de release (precisa de `keystore.properties` na raiz, apontando para a chave):
+
+```bash
+./gradlew :app:assembleRelease
+```
+
+Testes de todos os módulos (domínio, formato do asset, importador, dados com Robolectric, app com fluxo de ponta a ponta):
 
 ```bash
 ./gradlew test
 ```
 
-## Tecnologia
+Capturas de tela do app real em `app/build/screenshots/`:
 
-Kotlin · Jetpack Compose · Material 3 · Room · Coroutines e Flow · DataStore · Navigation Compose · WorkManager · Hilt. Clean Architecture com MVVM e Repository Pattern. Sem backend, Firebase, analytics ou permissão de internet.
+```bash
+./gradlew :app:testDebugUnitTest --tests "*ScreenshotTest*" -Pscreenshots
+```
 
-## Roteiro
+Regerar a biblioteca nutricional a partir dos arquivos oficiais em `nutrition-data/raw/`:
 
-- [x] **Fase 1:** análise e arquitetura
-- [x] **Fase 2:** banco nutricional (importador TACO/USDA, checagem cruzada, validação, asset versionado)
-- [ ] **Fase 3:** MVP (dashboard, biblioteca, busca, personalizados, refeições, cálculo, macros, metas)
-- [ ] **Fase 4:** histórico, gráficos, planejamento, peso, lista de compras, exportação e backup
-- [ ] **Fase 5:** testes completos, APK assinado, documentação de instalação
+```bash
+./gradlew :tools:food-importer:generateFoodLibrary
+```
+
+Conferir que o asset commitado é exatamente o gerado:
+
+```bash
+./gradlew :tools:food-importer:verifyFoodLibrary
+```
+
+Pilha: Kotlin 2.4 · Jetpack Compose (BOM 2026.09) · Material 3 · Room 2.8 · Coroutines/Flow · DataStore · Navigation Compose com rotas tipadas · Hilt · AGP 9.5. compileSdk 37, targetSdk 36, minSdk 26.
 
 ## Fontes nutricionais
 

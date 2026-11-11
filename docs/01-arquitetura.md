@@ -266,36 +266,36 @@ Convenções:
 
 ## 1.10 Bibliotecas
 
-Versões estáveis mais recentes publicadas no Google Maven e no Maven Central, consultadas em **10/11/2026**. A Fase 3 começa por um esqueleto que compila e gera APK. As versões só ficam fixadas no `libs.versions.toml` depois que esse esqueleto passar. Se houver incompatibilidade de plugin (AGP 9 com o Kotlin embutido, KSP e Hilt), a alternativa é a linha AGP 8.13.x.
+Versões fixadas em `gradle/libs.versions.toml` e compilando desde a Fase 3. O plano B (AGP 8.13) não foi necessário.
 
 | Biblioteca | Versão | Uso |
 |---|---|---|
-| Android Gradle Plugin | 9.5.1 (alternativa: 8.13.2) | Build |
-| Gradle (wrapper) | 9.9.0 ✔ | Build |
-| Kotlin | 2.4.21 ✔ | Linguagem e plugin Compose |
-| KSP | 2.3.13 | Processamento de anotações do Room e do Hilt |
-| JDK (toolchain) | 21 ✔ | Compilação |
-| Compose BOM | 2026.09.00 | UI, Material 3, ícones, animações |
-| Navigation Compose | 2.10.2 | Navegação com rotas tipadas |
-| Lifecycle (runtime-compose, viewmodel-compose) | 2.11.0 | `collectAsStateWithLifecycle`, ViewModel |
-| Hilt (Dagger) | 2.60.1 | Injeção de dependências |
-| AndroidX Hilt (navigation-compose, work) | 1.4.0 | `hiltViewModel()` e `HiltWorker` |
-| Room (runtime, ktx, compiler, testing) | 2.8.5 | Banco de dados |
-| DataStore Preferences | 1.3.0 | Preferências |
-| WorkManager | 2.12.0 | Lembretes e backup automático (opcionais) |
+| Android Gradle Plugin | 9.5.1 (Kotlin embutido) | Build |
+| Gradle (wrapper) | 9.9.0 | Build |
+| Kotlin | 2.4.21 | Linguagem, plugins Compose e serialization |
+| KSP | 2.3.13 | Room e Hilt |
+| JDK (toolchain) | 21 | Compilação |
+| Compose BOM | 2026.09.00 (Material 3 1.4.0, UI 1.12.1) | UI, ícones, animações |
+| Navigation Compose | 2.10.2 | Rotas tipadas (`@Serializable`) |
+| Lifecycle | 2.11.0 | `collectAsStateWithLifecycle`, ViewModel |
+| Activity Compose / Core KTX | 1.13.0 / 1.19.1 | Activity, edge-to-edge |
+| Hilt / AndroidX Hilt | 2.60.1 / 1.4.0 | Injeção de dependências, `hiltViewModel()` |
+| Room (+ plugin `androidx.room`) | 2.8.5 | Banco, esquemas exportados em `data/schemas` |
+| DataStore Preferences | 1.3.0 | Preferências e perfil da calculadora |
 | kotlinx-coroutines | 1.11.0 | Concorrência e Flow |
-| kotlinx-serialization-json | 1.12.0 ✔ | Asset da biblioteca, backup, rotas |
-| JUnit 4, kotlinx-coroutines-test, Turbine 1.2.1, Robolectric 4.17 | — | Testes de domínio, de Flow, de Room na JVM e de UI |
-| Compose UI Test | via BOM | Testes de fluxo de tela |
-| Apache PDFBox | 3.0.8 ✔ | Só no importador (checagem cruzada com o PDF da TACO); não vai para o APK |
-
-✔ = já fixado em `gradle/libs.versions.toml` e compilando (Fase 2). As demais são fixadas no esqueleto Android da Fase 3.
+| kotlinx-serialization-json | 1.12.0 | Asset da biblioteca, rotas |
+| JUnit 4, Robolectric 4.17, AndroidX Test 1.7, Compose UI Test, Turbine 1.2.1 | — | Testes JVM, Room e fluxo de UI |
+| Apache PDFBox | 3.0.8 | Só no importador; não vai para o APK |
+| WorkManager | 2.12.0 (Fase 4) | Lembretes e backup automático; ainda não usado |
 
 SDK:
-- `minSdk 26`: `java.time` nativo, sem *desugaring*.
-- `targetSdk`/`compileSdk`: o maior nível estável suportado pelo AGP escolhido (36 ou superior).
+- `compileSdk 37`: as bibliotecas atuais (ex.: core-ktx 1.19) exigem.
+- `targetSdk 36` (Android 16, o do Galaxy S26).
+- `minSdk 26`.
 
-O Galaxy S26 roda One UI sobre Android 16, então o app aproveita *edge-to-edge* e *predictive back*.
+Release:
+- R8 com remoção de código e recursos não usados, **sem ofuscação** (`-dontobfuscate`). O app é de código aberto, e nomes preservados evitam falhas por reflexão.
+- APK de 2,1 MB.
 
 Ficam de fora:
 - Firebase, analytics e crash reporting remoto.

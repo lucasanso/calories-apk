@@ -1,5 +1,15 @@
 # 2. Banco de dados (Room)
 
+> **Esquema v1 implementado na Fase 3** (`data/schemas/com.calories.data.db.CaloriesDatabase/1.json`).
+>
+> **Tabelas e view:** `data_source`, `food_category`, `food` + `food_fts`, `food_usage`, `meal_slot`, `diary_meal`, `diary_entry`, `nutrition_goal`, `meal_template`, `meal_template_item`, `app_meta` e a view `daily_nutrition`.
+>
+> **Ficam para a Fase 4, via migration 1 → 2 testada:** `food_portion`, `weight_record`, `diet_plan*`, `planned_meal*` e `shopping_list*`.
+>
+> **Diferenças em relação ao desenho abaixo:**
+> - No v1, a quantidade do lançamento já está na unidade de referência do alimento (sem porções). O snapshot fica em `refAmount` + colunas `ref_*`, e o consumo em colunas sem prefixo.
+> - A fonte dos personalizados é `USER`.
+
 ## 2.1 Princípios
 
 1. **Quatro domínios de dados separados**: biblioteca, personalizados, histórico e planejamento (tabela em 2.4).
