@@ -118,6 +118,8 @@ Ações:
 
 ### 3. Planejamento
 
+> **Como ficou na Fase 4 (0.4.0):** abas Calendário, Planos e Compras. O calendário é só a visão de mês (dia com fundo destacado e kcal planejadas; sem cor por plano). Aplicar plano em lote: intervalo + dias da semana, substituir ou somar. "Limpar" é por dia. Planos não têm exportação individual (a exportação de planos fica em Ajustes → Dados e backup e leva todos). A lista de compras sai em ordem alfabética, sem agrupar por categoria, e pode ser compartilhada como texto. O Hoje ganhou um cartão "Planejado para este dia" com atalho para registrar.
+
 - **Calendário:**
   - Visões de mês e de semana. Cada dia mostra um marcador com a cor do plano aplicado e as kcal planejadas.
   - Toque no dia abre o **Dia planejado**: mesma estrutura visual do Hoje, com refeições planejadas e totais comparados à meta.
@@ -128,6 +130,8 @@ Ações:
   - Lista: itens agrupados por categoria, com checkbox, edição de quantidade, item manual e "limpar comprados".
 
 ### 4. Histórico
+
+> **Como ficou na Fase 4:** abas Consumo e Peso. Consumo tem Semana e Mês (o "Dia" é o próprio Hoje, aberto ao tocar num dia da lista; o Hoje tem seletor de data para qualquer dia passado). O gráfico de macros mostra a % da energia de cada dia; as barras de progresso mostram as médias em gramas contra as metas.
 
 - **Dia, Semana e Mês** (seletor segmentado) e navegação por período.
 - Gráficos:
@@ -144,7 +148,7 @@ Ações:
 - **Calculadora** (ver 04, §4.7).
 - **Refeições:** renomear, reordenar, horário, ativar ou desativar, lembrete.
 - **Aparência:** tema (sistema, claro, escuro) e Material You (cores do papel de parede).
-- **Dados:** exportar CSV, exportar JSON, criar backup, restaurar, exportar planos, backup automático em pasta.
+- **Dados:** exportar CSV, exportar JSON, criar backup, restaurar, exportar planos, backup automático em pasta. *(Fase 4: tudo pelo seletor de arquivos do sistema, menos o backup automático, que não entrou; o backup completo JSON cumpre o papel de "exportar JSON". Lembretes por refeição também não entraram.)*
 - **Fontes e licenças:** citações TACO e USDA, versão da biblioteca e licenças das bibliotecas de código aberto.
 - **Sobre e privacidade:** sem internet, sem conta, sem anúncios, dados só no aparelho.
 

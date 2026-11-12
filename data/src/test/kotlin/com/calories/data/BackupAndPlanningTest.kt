@@ -173,7 +173,7 @@ class BackupAndPlanningTest {
         val db = freshDb(); populate(db, settings)
         val backup = BackupRepositoryImpl(db, settings)
         val csv = backup.exportDiaryCsv(null, null, excelPtBr = false)
-        assertTrue(csv.startsWith("﻿data,refeicao,alimento"))
+        assertTrue(csv.startsWith("\uFEFFdata,refeicao,alimento"))
         assertTrue(csv.contains("2026-11-11,Almoço,\"Frango, peito, sem pele, grelhado\",,Grelhado,TACO4,150,g,238.5,48,0,3.75,1.35,0,75\r\n"))
         val excel = backup.exportDiaryCsv(day, day, excelPtBr = true)
         assertTrue(excel.contains("2026-11-11;Almoço;Frango, peito, sem pele, grelhado;;Grelhado;TACO4;150;g;238,5;48;0;3,75;1,35;0;75\r\n"))

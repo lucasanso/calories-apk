@@ -26,7 +26,7 @@ class DocumentIo @Inject constructor(@ApplicationContext private val context: Co
                 require(out.size() + n <= maxBytes) { "Arquivo grande demais" }
                 out.write(buffer, 0, n)
             }
-            out.toString(Charsets.UTF_8.name()).removePrefix("﻿")
+            out.toString(Charsets.UTF_8.name()).removePrefix("\uFEFF")
         }
     }
 }

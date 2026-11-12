@@ -136,6 +136,8 @@ Os use cases não precisam de módulo: têm `@Inject constructor` e o Hilt os co
 | Compras | `GenerateShoppingList(seleção)`, `ToggleShoppingItem`, `AddManualShoppingItem`, `EditShoppingItemQuantity`, `DeleteShoppingList` |
 | Dados | `ExportDiaryCsv(range)`, `ExportAllJson`, `ExportDietPlans`, `CreateBackup`, `ValidateBackup`, `RestoreBackup` |
 
+> **Implementado (Fase 4):** `CreatePlan`, `CreatePlanFromDiaryDay`, `DuplicatePlan`, `AddFoodToPlan`, `AddFoodToPlannedDay`, `ApplyPlanToDates`, `CopyPlannedDay`, `LogPlannedDay`, `GenerateShoppingList`, `SaveWeight` (em `domain/usecase/PlanningUseCases.kt`), mais `ShoppingListConsolidator`, `PeriodStats`, `PeriodSeries`, `SlotGrouping`, `Periods` e `WeightRules` (`domain/nutrition/PlanningMath.kt`). Operações simples (editar quantidade, excluir item, marcar comprado) vão direto do ViewModel ao repositório. Backup, CSV e importação de planos ficam em `BackupRepository` (`data/backup/`); a escrita e leitura dos arquivos escolhidos pelo usuário, em `DocumentIo` (app).
+
 ## 1.7 Decisões técnicas
 
 | # | Decisão | Alternativas consideradas | Motivo |
@@ -286,7 +288,7 @@ Versões fixadas em `gradle/libs.versions.toml` e compilando desde a Fase 3. O p
 | kotlinx-serialization-json | 1.12.0 | Asset da biblioteca, rotas |
 | JUnit 4, Robolectric 4.17, AndroidX Test 1.7, Compose UI Test, Turbine 1.2.1 | — | Testes JVM, Room e fluxo de UI |
 | Apache PDFBox | 3.0.8 | Só no importador; não vai para o APK |
-| WorkManager | 2.12.0 (Fase 4) | Lembretes e backup automático; ainda não usado |
+| WorkManager | 2.12.0 | Previsto para lembretes e backup automático; não usado (nenhum dos dois entrou na Fase 4) |
 
 SDK:
 - `compileSdk 37`: as bibliotecas atuais (ex.: core-ktx 1.19) exigem.

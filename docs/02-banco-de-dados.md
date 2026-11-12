@@ -4,7 +4,9 @@
 >
 > **Tabelas e view:** `data_source`, `food_category`, `food` + `food_fts`, `food_usage`, `meal_slot`, `diary_meal`, `diary_entry`, `nutrition_goal`, `meal_template`, `meal_template_item`, `app_meta` e a view `daily_nutrition`.
 >
-> **Ficam para a Fase 4, via migration 1 → 2 testada:** `food_portion`, `weight_record`, `diet_plan*`, `planned_meal*` e `shopping_list*`.
+> **Esquema v2 (Fase 4)** (`.../2.json`), via `@AutoMigration(1 → 2)` testada com `MigrationTestHelper` (dados da v1 preservados e lidos pelos repositórios depois da migração): `weight_record`, `diet_plan`, `diet_plan_item`, `planned_item`, `shopping_list` e `shopping_list_item`.
+>
+> **Simplificação no v2:** em vez de `diet_plan_meal`/`diet_plan_item` e `planned_meal`/`planned_meal_item`, cada item guarda direto o `slotId` da refeição (`diet_plan_item(planId, slotId, foodId, amount)` e `planned_item(date, slotId, foodId, amount, sourcePlanId?)`). As refeições de um plano ou dia são sempre as refeições configuradas do app, então a tabela intermediária não acrescentava nada. Quantidades na unidade de referência do alimento, como no diário. `food_portion` (medidas caseiras) não entrou.
 >
 > **Diferenças em relação ao desenho abaixo:**
 > - No v1, a quantidade do lançamento já está na unidade de referência do alimento (sem porções). O snapshot fica em `refAmount` + colunas `ref_*`, e o consumo em colunas sem prefixo.
@@ -30,8 +32,8 @@
 | DailyNutrition | `daily_nutrition` (**view**) | Calculada a partir do diário. Não é cache (decisão D4). |
 | NutritionGoal | `nutrition_goal` | Versionada por `effectiveFrom`. |
 | WeightRecord | `weight_record` | Um registro por dia. |
-| DietPlan | `diet_plan`, `diet_plan_meal`, `diet_plan_item` | Modelo reutilizável ("Plano A — Dias de treino"). |
-| PlannedMeal | `planned_meal`, `planned_meal_item` | Instância no calendário (data). |
+| DietPlan | `diet_plan`, `diet_plan_item` | Modelo reutilizável ("Plano A — Dias de treino"). |
+| PlannedMeal | `planned_item` | Item planejado numa data e refeição do calendário. |
 | ShoppingList / ShoppingListItem | `shopping_list`, `shopping_list_item` | — |
 | — | `meal_template`, `meal_template_item` | Refeições favoritas reutilizáveis. |
 | — | `app_meta` | Versão da biblioteca instalada e controle do seed. |
@@ -53,14 +55,13 @@ erDiagram
     meal_template ||--|{ meal_template_item : "itens"
     food ||--o{ meal_template_item : "RESTRICT"
 
-    diet_plan ||--|{ diet_plan_meal : "refeições"
-    diet_plan_meal ||--|{ diet_plan_item : "itens"
+    diet_plan ||--|{ diet_plan_item : "itens (CASCADE)"
+    meal_slot ||--o{ diet_plan_item : "slot (CASCADE)"
     food ||--o{ diet_plan_item : "RESTRICT"
 
-    diet_plan |o--o{ planned_meal : "sourcePlanId (SET NULL)"
-    meal_slot |o--o{ planned_meal : "slot"
-    planned_meal ||--|{ planned_meal_item : "itens"
-    food ||--o{ planned_meal_item : "RESTRICT"
+    diet_plan |o--o{ planned_item : "sourcePlanId (SET NULL)"
+    meal_slot ||--o{ planned_item : "slot (CASCADE)"
+    food ||--o{ planned_item : "RESTRICT"
 
     shopping_list ||--|{ shopping_list_item : "itens"
     food |o--o{ shopping_list_item : "SET NULL"
@@ -76,7 +77,7 @@ erDiagram
 | **Personalizados** | `food` (`origin = 'CUSTOM'`), `food_portion` (`isUserDefined = 1`) | Usuário, pelo `CustomFoodDao` | Todo `UPDATE` e `DELETE` do `CustomFoodDao` tem `WHERE origin = 'CUSTOM'` na própria query. Mesmo um id errado não altera a biblioteca. |
 | **Estado do usuário sobre alimentos** | `food_usage` (favorito, contagem de uso, último uso) | Usuário | Fica fora de `food`, então atualizar a biblioteca nunca apaga favoritos. |
 | **Histórico** | `diary_meal`, `diary_entry`, `nutrition_goal`, `weight_record` | Usuário | Snapshot em `diary_entry`. `foodId` com `SET NULL`. Metas versionadas. |
-| **Planejamento** | `meal_template*`, `diet_plan*`, `planned_meal*`, `shopping_list*` | Usuário | Referências vivas a `food`. Ao registrar uma refeição planejada como consumida, gera-se um `diary_entry` com snapshot. |
+| **Planejamento** | `meal_template*`, `diet_plan*`, `planned_item`, `shopping_list*` | Usuário | Referências vivas a `food`. Ao registrar uma refeição planejada como consumida, gera-se um `diary_entry` com snapshot. |
 
 Proteção da biblioteca, em três camadas:
 1. **Interface:** a tela de detalhe de um alimento `LIBRARY` não tem botão "Editar", só "Duplicar como personalizado".
@@ -293,23 +294,23 @@ Alterar a meta hoje grava uma linha com `effectiveFrom = hoje`, substituindo a d
 `meal_template(id, name, isFavorite, sortOrder, createdAt, updatedAt)`
 `meal_template_item(id, templateId FK CASCADE IX, foodId FK RESTRICT IX, inputAmount, inputUnit, portionLabel?, amountInRefUnit, sortOrder)`
 
-### `diet_plan`, `diet_plan_meal`, `diet_plan_item`: modelos de dia
+### `diet_plan` e `diet_plan_item`: modelos de dia
 
-`diet_plan(id, name, description?, colorArgb?, sortOrder, createdAt, updatedAt)`. Exemplos: "Plano A — Dias de treino", "Plano B — Descanso".
-`diet_plan_meal(id, planId FK CASCADE IX, slotId FK SET NULL IX?, name, timeMinutes?, sortOrder)`
-`diet_plan_item(id, planMealId FK CASCADE IX, foodId FK RESTRICT IX, inputAmount, inputUnit, portionLabel?, amountInRefUnit, sortOrder)`
+`diet_plan(id, name, description?, createdAt, updatedAt)`. Exemplos: "Plano A — Dias de treino", "Plano B — Descanso".
+`diet_plan_item(id, planId FK CASCADE IX, slotId FK → meal_slot CASCADE IX, foodId FK RESTRICT IX, amount, sortOrder)`
 
-### `planned_meal` e `planned_meal_item`: calendário
+### `planned_item`: calendário
 
-`planned_meal(id, date IX, slotId FK SET NULL IX?, name, timeMinutes?, sourcePlanId FK → diet_plan SET NULL IX?, loggedDiaryMealId?, sortOrder)`
-`planned_meal_item(id, plannedMealId FK CASCADE IX, foodId FK RESTRICT IX, inputAmount, inputUnit, portionLabel?, amountInRefUnit, sortOrder)`
+`planned_item(id, date IX, slotId FK → meal_slot CASCADE IX, foodId FK RESTRICT IX, amount, sourcePlanId FK → diet_plan SET NULL IX?, sortOrder)`
 
-Aplicar um plano a uma data **copia** as refeições e os itens do plano para `planned_meal*`, com `sourcePlanId` para rastrear a origem. Editar o plano depois não altera dias já planejados. Editar um dia não altera o plano. O modo `REPLACE` apaga antes as refeições planejadas daquela data; o modo `APPEND` acrescenta.
+Aplicar um plano a uma data **copia** os itens do plano para `planned_item`, com `sourcePlanId` para rastrear a origem. Editar o plano depois não altera dias já planejados. Editar um dia não altera o plano. O modo `REPLACE` apaga antes o planejamento daquela data; o modo `APPEND` acrescenta. Aplicar em várias datas é uma transação só (tudo ou nada). Valores planejados são "vivos" (vêm do cadastro atual do alimento); registrar no diário grava o snapshot.
 
 ### `shopping_list` e `shopping_list_item`
 
 `shopping_list(id, name, fromDate?, toDate?, createdAt)`
-`shopping_list_item(id, listId FK CASCADE IX, foodId FK SET NULL IX?, name, preparation?, quantity REAL?, unit TEXT?, isChecked, isManual, sortOrder)`
+`shopping_list_item(id, listId FK CASCADE IX, foodId FK SET NULL IX?, name, detail?, quantity REAL?, unit TEXT?, isChecked, isManual, sortOrder)`
+
+A lista é uma cópia: gerada uma vez a partir de `planned_item` (soma por alimento e unidade; `detail` diz o preparo e, se for preparado, "peso do alimento pronto"), depois editável sem afetar o planejamento.
 
 ### `app_meta`
 

@@ -72,7 +72,7 @@ class CsvTable(val header: List<String>, val rows: List<List<String>>, val origi
     companion object {
         /** Lê um CSV de curadoria: ignora linhas vazias e comentários iniciados por `#`. */
         fun readCuration(path: Path): CsvTable {
-            val text = Files.readString(path, Charsets.UTF_8).removePrefix("﻿")
+            val text = Files.readString(path, Charsets.UTF_8).removePrefix("\uFEFF")
             val withoutComments = text.lineSequence().filterNot { it.trimStart().startsWith("#") || it.isBlank() }.joinToString("\n")
             val records = CsvReader(withoutComments.reader()).readAll()
             require(records.isNotEmpty()) { "$path: arquivo vazio" }

@@ -5,7 +5,7 @@ import java.math.BigDecimal
 /** Escritor CSV (RFC 4180). [excelPtBr]: separador ";" e vírgula decimal, como o Excel em português espera. */
 class CsvWriter(private val excelPtBr: Boolean) {
     private val separator = if (excelPtBr) ';' else ','
-    private val out = StringBuilder("﻿") // BOM: acentos corretos ao abrir no Excel
+    private val out = StringBuilder("\uFEFF") // BOM: acentos corretos ao abrir no Excel
 
     fun row(values: List<Any?>): CsvWriter {
         values.forEachIndexed { i, v ->

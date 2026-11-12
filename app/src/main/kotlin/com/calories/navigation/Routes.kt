@@ -1,5 +1,6 @@
 package com.calories.navigation
 
+import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 
 // Destinos da barra inferior
@@ -10,6 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object SettingsRoute
 
 /** Onde o alimento escolhido no seletor vai parar. */
+@Keep
 enum class PickTarget { DIARY, PLANNED_DAY, PLAN }
 
 // Destinos internos
